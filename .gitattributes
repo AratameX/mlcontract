@@ -1,0 +1,42 @@
+# Line endings
+#
+# Git for Windows defaults to core.autocrlf=true, which checks files out with
+# CRLF in the working tree. The `mixed-line-ending --fix=lf` pre-commit hook then
+# rewrites them back to LF, Git converts them again on the next checkout, and the
+# two fight forever — every commit reports modified files nobody edited.
+#
+# Declaring the repository LF-only in both the index and the working tree removes
+# the disagreement entirely, and keeps diffs clean across Windows, macOS and the
+# Linux CI runners.
+* text=auto eol=lf
+
+# Explicit for the file types this project actually contains, so intent survives
+# even if the wildcard above is ever narrowed.
+*.py      text eol=lf diff=python
+*.pyi     text eol=lf diff=python
+*.toml    text eol=lf
+*.cfg     text eol=lf
+*.ini     text eol=lf
+*.md      text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.json    text eol=lf
+*.csv     text eol=lf
+*.txt     text eol=lf
+LICENSE   text eol=lf
+NOTICE    text eol=lf
+py.typed  text eol=lf
+
+# Binary: never convert, never diff as text.
+*.png     binary
+*.jpg     binary
+*.ico     binary
+*.gz      binary
+*.zip     binary
+*.whl     binary
+*.pkl     binary
+*.parquet binary
+
+# Keep generated lock files out of pull-request diffs while still versioning them.
+uv.lock          linguist-generated=true
+package-lock.json linguist-generated=true
