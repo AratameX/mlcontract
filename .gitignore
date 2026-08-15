@@ -1,0 +1,53 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.hypothesis/
+
+# Type checking / linting
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+
+# Documentation build
+site/
+docs/_build/
+
+# Benchmarks: scripts and committed baselines are tracked; scratch runs are not.
+benchmarks/results/scratch/
+
+# Editors / OS
+.idea/
+.DS_Store
+
+# VS Code: share the workspace config, ignore personal state.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+
+# Never commit these
+*.pem
+*.key
+.env
+.env.*
+secrets.*

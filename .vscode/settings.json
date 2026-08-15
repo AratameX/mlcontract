@@ -1,0 +1,61 @@
+{
+  // ---------------------------------------------------------------------
+  // Interpreter
+  // VS Code resolves ".venv" in the workspace root on Windows, macOS and
+  // Linux, so this single path works everywhere.
+  // ---------------------------------------------------------------------
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+  "python.terminal.activateEnvironment": true,
+
+  // ---------------------------------------------------------------------
+  // Type checking
+  // Mypy is the authority — it is what gates CI, and it reads its config
+  // from pyproject.toml. Pylance stays at "standard" deliberately: running
+  // it in "strict" produces a second, differently-opinionated set of errors
+  // that do not fail the build, which trains you to ignore squiggles.
+  // ---------------------------------------------------------------------
+  "python.analysis.typeCheckingMode": "standard",
+  "python.analysis.extraPaths": ["src"],
+  "python.analysis.autoImportCompletions": true,
+  "mypy-type-checker.importStrategy": "fromEnvironment",
+  "mypy-type-checker.reportingScope": "workspace",
+
+  // ---------------------------------------------------------------------
+  // Lint & format — Ruff only
+  // ---------------------------------------------------------------------
+  "ruff.importStrategy": "fromEnvironment",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+
+  // ---------------------------------------------------------------------
+  // Tests
+  // ---------------------------------------------------------------------
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+
+  // ---------------------------------------------------------------------
+  // Noise reduction
+  // ---------------------------------------------------------------------
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.egg-info": true,
+    "**/.mypy_cache": true,
+    "**/.ruff_cache": true,
+    "**/.pytest_cache": true
+  },
+  "search.exclude": {
+    "**/.venv": true,
+    "**/dist": true,
+    "**/htmlcov": true
+  },
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.rulers": [100]
+}

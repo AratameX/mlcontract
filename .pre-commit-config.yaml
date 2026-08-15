@@ -1,0 +1,55 @@
+# Hooks run automatically on `git commit`. Install them once with:
+#
+#     pre-commit install
+#
+# Every Python hook below is `language: system`, meaning it uses the tool
+# already installed in your virtual environment rather than a copy pinned to a
+# separate revision here. That is deliberate: it guarantees the ruff and mypy
+# that block your commit are byte-identical to the ones that gate CI, so a hook
+# can never pass locally and fail in the build (or vice versa). Versions have
+# exactly one source of truth: pyproject.toml.
+
+default_install_hook_types: [pre-commit, commit-msg]
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+        exclude: ^\.vscode/  # JSONC: comments are valid there, not in strict JSON
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff (lint)
+        entry: ruff check --fix
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+
+      - id: ruff-format
+        name: ruff (format)
+        entry: ruff format
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+
+      - id: mypy
+        name: mypy (strict)
+        entry: mypy
+        language: system
+        pass_filenames: false  # mypy reads its file list from pyproject.toml
+        types: [python]
+        require_serial: true

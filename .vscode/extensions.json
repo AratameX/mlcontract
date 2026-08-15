@@ -1,0 +1,21 @@
+{
+  // Recommended for anyone working on mlcontract. VS Code offers these on first
+  // open of the workspace. They mirror exactly what CI enforces, so problems
+  // surface in the editor instead of in a failed build.
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "charliermarsh.ruff",
+    "ms-python.mypy-type-checker",
+    "tamasfe.even-better-toml",
+    "redhat.vscode-yaml",
+    "github.vscode-github-actions"
+  ],
+  "unwantedRecommendations": [
+    // Superseded by Ruff, which does both lint and format. Running these
+    // alongside it produces fights over the same lines.
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "ms-python.flake8"
+  ]
+}
