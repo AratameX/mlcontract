@@ -26,10 +26,43 @@ contract format carries its own `spec_version`.
 - Pre-commit hooks wired to the virtual environment's own tools, so local hooks
   and CI can never disagree about tool versions.
 - Shared editor configuration for VS Code contributors (`.vscode/`).
+- `.gitattributes` enforcing LF line endings in both index and working tree, so
+  Windows checkouts do not conflict with the `mixed-line-ending` hook.
+
+- Core domain model: `Contract` and `Feature`, immutable and validated at
+  construction, so an object that exists is a valid contract.
+- Canonical type system (`DType`) with common aliases and an explicit widening
+  relation, which later underpins breaking-change detection.
+- Declarative constraint catalogue: `min`, `max`, `allowed_values`, `pattern`,
+  `unique`, `max_null_fraction`, each declaring the types it applies to and the
+  direction in which it relaxes.
+- Contract-level rules: required and optional features, column ordering, extra
+  columns, and row-count bounds.
+- Serialisation to and from JSON and YAML through one canonical dictionary
+  representation, so both formats produce identical objects.
+- `spec_version` on every contract, separate from the author's own `version`,
+  so the file format can evolve without invalidating stored contracts.
+- Exception hierarchy (`MLContractError`, `ContractDefinitionError`,
+  `IntegrationError`) and a permanent error-code registry, `MLC001`–`MLC014`
+  and `MLC901`.
+- Unknown keys in contract documents are rejected with a suggested correction
+  rather than silently ignored.
+- Declared feature renames via `previous_names`. Renames are never inferred.
+- Property-based tests covering round-trip losslessness, JSON/YAML equivalence
+  and serialisation determinism.
+
+### Fixed
+
+- Zero-valued constraints (`min=0`, `max=0`, `max_null_fraction=0.0`) were
+  treated as undeclared, because `0 == False` in Python made the containment
+  test `value in (None, False)` true. They were dropped from serialised
+  contracts and skipped during applicability checking. Found by the property
+  tests before any release.
 
 ### Compatibility
 
-- Python API: n/a (no public API yet beyond `__version__`).
-- Contract format: n/a (not yet introduced).
+- Python API: first public surface. `Contract`, `Feature`, `DType`,
+  `SPEC_VERSION`, and the three exception types.
+- Contract format: `spec_version` 1, introduced here.
 
 [Unreleased]: https://github.com/AratameX/mlcontract/commits/main

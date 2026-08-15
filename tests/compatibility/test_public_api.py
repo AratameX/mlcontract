@@ -7,6 +7,10 @@ made deliberately, in the same commit, with a changelog entry.
 
 Adding a symbol requires updating ``EXPECTED_PUBLIC_API`` in the same pull
 request. That is the point: the update is the review signal.
+
+Ordering within ``__all__`` is deliberately not checked here — ruff's RUF022
+already enforces it, and two mechanisms enforcing the same rule by different
+conventions is worse than one.
 """
 
 from __future__ import annotations
@@ -15,6 +19,13 @@ import mlcontract
 
 EXPECTED_PUBLIC_API = frozenset(
     {
+        "SPEC_VERSION",
+        "Contract",
+        "ContractDefinitionError",
+        "DType",
+        "Feature",
+        "IntegrationError",
+        "MLContractError",
         "__version__",
     }
 )
@@ -38,11 +49,6 @@ def test_public_api_matches_snapshot():
 def test_every_exported_name_resolves():
     for name in mlcontract.__all__:
         assert hasattr(mlcontract, name), f"__all__ advertises {name!r} but it does not exist"
-
-
-def test_all_is_sorted():
-    """Keeps diffs on ``__all__`` readable as the API grows."""
-    assert list(mlcontract.__all__) == sorted(mlcontract.__all__)
 
 
 def test_no_private_names_are_exported():

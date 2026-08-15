@@ -10,7 +10,6 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
-# TODO(setup): replace the two PLACEHOLDER values below before the first release.
 authors = [{ name = "Pranav Bansode", email = "hawkeyes1818@gmail.com" }]
 maintainers = [{ name = "Pranav Bansode", email = "hawkeyes1818@gmail.com" }]
 keywords = [
@@ -131,13 +130,17 @@ select = [
     "TID",      # flake8-tidy-imports
 ]
 ignore = [
+    "ANN401",  # Any in signatures: contract documents are arbitrary JSON, and
+               # pretending otherwise would mean lying in the annotations.
     "D107",  # __init__ docstring — covered by the class docstring
     "D203",  # incompatible with D211
     "D213",  # incompatible with D212
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D100", "D103", "D104", "ANN001", "ANN201"]
+# Test names are the documentation; requiring docstrings on every test class and
+# method adds noise without adding information.
+"tests/*" = ["D100", "D101", "D102", "D103", "D104", "D106", "ANN001", "ANN201"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
