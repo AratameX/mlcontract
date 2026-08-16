@@ -2,8 +2,8 @@
 
 **Executable contracts for ML systems — validate data, models and predictions before they break production.**
 
-> **Status: pre-alpha, under active development.** The public API is empty; there is
-> nothing useful to install yet. This notice is removed at `v0.1.0`.
+> **Status: pre-alpha, under active development.** The API may change before
+> `v0.1.0`, when this notice is removed.
 
 ---
 

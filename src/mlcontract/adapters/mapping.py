@@ -101,7 +101,7 @@ class CsvSource:
         contract: Contract,
         *,
         delimiter: str = ",",
-        encoding: str = "utf-8",
+        encoding: str = "utf-8-sig",
     ) -> None:
         self._path = Path(path)
         self._rows: list[dict[str, Any]] = []
