@@ -13,6 +13,30 @@ contract format carries its own `spec_version`.
 
 ### Added
 
+- Validation engine. `Contract.validate(data)` and the module-level
+  `validate(contract, data)` check real data and return a `ValidationReport`.
+- `DataSource` protocol: the engine imports no data library at all, so any
+  backend can be added by implementing six methods.
+- Stdlib adapters for `list[dict]` and CSV/TSV files. CSV carries no types, so
+  the contract supplies them; a field that will not parse keeps its original
+  text rather than being silently coerced to null.
+- `ValidationReport`, `Violation`, `Sample` and `Severity`. Reports carry error
+  codes, affected row counts, sampled offending values with row positions, and
+  remediation text, and render as text or JSON.
+- Structural checks (`MLC101`-`MLC106`): missing required columns, undeclared
+  columns, column order, column types, row-count bounds.
+- Value checks (`MLC201`-`MLC208`): nullability, null fraction, ranges, allowed
+  values, patterns, uniqueness.
+- Validation exception family, raised only via `raise_for_status()`.
+- `sample_values=False` for reports written where raw data should not go.
+
+### Changed
+
+- `ValidationReport` deliberately defines no `__bool__`. It would have to mean
+  either "is valid" or "has violations" — opposites — while `__len__` already
+  implies the second. Callers say `report.is_valid`.
+
+
 - Project bootstrap: `src/` layout, canonical `pyproject.toml`, Apache-2.0
   license, dependency-free core.
 - Tooling baseline: ruff (lint + format), mypy in strict mode, pytest with

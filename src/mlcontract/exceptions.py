@@ -70,10 +70,58 @@ MLC013 = ErrorCode("MLC013", "Declared previous name collides with a current fea
 MLC014 = ErrorCode("MLC014", "Row-count bounds are invalid")
 
 # --------------------------------------------------------------------------
+# MLC1xx — structural validation
+# --------------------------------------------------------------------------
+
+MLC101 = ErrorCode("MLC101", "A required feature is missing from the data")
+MLC102 = ErrorCode("MLC102", "The data contains a column the contract does not declare")
+MLC103 = ErrorCode("MLC103", "Columns are not in the order the contract declares")
+MLC104 = ErrorCode("MLC104", "A column's type does not satisfy the declared type")
+MLC105 = ErrorCode("MLC105", "The dataset has fewer rows than the contract permits")
+MLC106 = ErrorCode("MLC106", "The dataset has more rows than the contract permits")
+
+# --------------------------------------------------------------------------
+# MLC2xx — value constraints
+# --------------------------------------------------------------------------
+
+MLC201 = ErrorCode("MLC201", "Null values found in a column declared not nullable")
+MLC202 = ErrorCode("MLC202", "The proportion of nulls exceeds the permitted maximum")
+MLC203 = ErrorCode("MLC203", "Values fall below the declared minimum")
+MLC204 = ErrorCode("MLC204", "Values exceed the declared maximum")
+MLC205 = ErrorCode("MLC205", "Values fall outside the declared set of allowed values")
+MLC206 = ErrorCode("MLC206", "Values do not match the declared pattern")
+MLC207 = ErrorCode("MLC207", "Duplicate values found in a column declared unique")
+
+# --------------------------------------------------------------------------
+# MLC1xx — structural validation
+# --------------------------------------------------------------------------
+
+MLC101 = ErrorCode("MLC101", "A required feature is missing from the data")
+MLC102 = ErrorCode("MLC102", "The data contains a column the contract does not declare")
+MLC103 = ErrorCode("MLC103", "Columns are not in the order the contract declares")
+MLC104 = ErrorCode("MLC104", "A column's type does not match the contract")
+MLC105 = ErrorCode("MLC105", "The dataset has fewer rows than the contract permits")
+MLC106 = ErrorCode("MLC106", "The dataset has more rows than the contract permits")
+
+# --------------------------------------------------------------------------
+# MLC2xx — value constraints
+# --------------------------------------------------------------------------
+
+MLC201 = ErrorCode("MLC201", "Null values in a feature declared not nullable")
+MLC202 = ErrorCode("MLC202", "Proportion of nulls exceeds the permitted maximum")
+MLC203 = ErrorCode("MLC203", "Values below the permitted minimum")
+MLC204 = ErrorCode("MLC204", "Values above the permitted maximum")
+MLC205 = ErrorCode("MLC205", "Values outside the permitted set")
+MLC206 = ErrorCode("MLC206", "Values not matching the required pattern")
+MLC207 = ErrorCode("MLC207", "Duplicate values in a feature declared unique")
+MLC208 = ErrorCode("MLC208", "Values whose type does not match the contract")
+
+# --------------------------------------------------------------------------
 # MLC9xx — integrations
 # --------------------------------------------------------------------------
 
 MLC901 = ErrorCode("MLC901", "An optional dependency is required but not installed")
+MLC902 = ErrorCode("MLC902", "The data is of a kind no adapter can read")
 
 
 REGISTRY: dict[str, ErrorCode] = {
@@ -93,7 +141,21 @@ REGISTRY: dict[str, ErrorCode] = {
         MLC012,
         MLC013,
         MLC014,
+        MLC101,
+        MLC102,
+        MLC103,
+        MLC104,
+        MLC105,
+        MLC106,
+        MLC201,
+        MLC202,
+        MLC203,
+        MLC204,
+        MLC205,
+        MLC206,
+        MLC207,
         MLC901,
+        MLC902,
     )
 }
 """Every error code this release can raise, keyed by its identifier."""
@@ -126,6 +188,36 @@ class ContractDefinitionError(MLContractError):
     constraints, malformed documents. It means the contract cannot be used at
     all, as distinct from data failing to satisfy a valid contract.
     """
+
+
+class ContractValidationError(MLContractError):
+    """Data failed to satisfy a valid contract.
+
+    Distinct from :class:`ContractDefinitionError`: the contract is fine, the
+    data is not. Raised only by
+    :meth:`~mlcontract.report.ValidationReport.raise_for_status`, never by
+    validation itself — validation returns a report so that every problem is
+    visible at once.
+
+    Attributes:
+        report: The full :class:`~mlcontract.report.ValidationReport`, so a
+            caller catching this still has access to every violation rather than
+            just the summary in the message.
+    """
+
+    def __init__(
+        self, message: str, *, code: ErrorCode, report: Any = None, **context: Any
+    ) -> None:
+        super().__init__(message, code=code, **context)
+        self.report = report
+
+
+class SchemaValidationError(ContractValidationError):
+    """The shape of the data is wrong — columns, ordering, types or row counts."""
+
+
+class FeatureValidationError(ContractValidationError):
+    """Individual values violate the constraints declared for their feature."""
 
 
 class IntegrationError(MLContractError):

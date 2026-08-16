@@ -26,17 +26,55 @@ from mlcontract.contract import SPEC_VERSION, Contract, Feature
 from mlcontract.dtypes import DType
 from mlcontract.exceptions import (
     ContractDefinitionError,
+    ContractValidationError,
+    FeatureValidationError,
     IntegrationError,
     MLContractError,
+    SchemaValidationError,
 )
+from mlcontract.report import Sample, Severity, ValidationReport, Violation
+
+
+def validate(
+    contract: Contract,
+    data: object,
+    *,
+    sample_values: bool = True,
+    max_samples: int = 5,
+) -> ValidationReport:
+    """Check data against a contract and return a report.
+
+    A function-shaped alternative to :meth:`Contract.validate`, for code that
+    reads better with the contract as an argument. The two are equivalent.
+
+    Args:
+        contract: The contract to check against.
+        data: A list of mappings, a path to a ``.csv`` or ``.tsv`` file, or a
+            pandas DataFrame if the ``pandas`` extra is installed.
+        sample_values: Whether violations carry examples of offending values.
+        max_samples: How many examples each violation carries.
+
+    Returns:
+        A report listing every violation found.
+    """
+    return contract.validate(data, sample_values=sample_values, max_samples=max_samples)
+
 
 __all__ = [
     "SPEC_VERSION",
     "Contract",
     "ContractDefinitionError",
+    "ContractValidationError",
     "DType",
     "Feature",
+    "FeatureValidationError",
     "IntegrationError",
     "MLContractError",
+    "Sample",
+    "SchemaValidationError",
+    "Severity",
+    "ValidationReport",
+    "Violation",
     "__version__",
+    "validate",
 ]
