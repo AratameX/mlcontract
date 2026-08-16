@@ -30,8 +30,21 @@ contract format carries its own `spec_version`.
 - Validation exception family, raised only via `raise_for_status()`.
 - `sample_values=False` for reports written where raw data should not go.
 
+- pandas adapter, behind the `pandas` extra and imported lazily, so the core
+  install never pulls pandas in. Explicit dtype mapping covering NumPy and
+  nullable extension types, categoricals, timezone-aware datetimes, and dates
+  held in object columns.
+- pandas' four spellings of missing — `NaN`, `None`, `NaT` and `pd.NA` — are all
+  handled by delegating to `isna` rather than reimplementing the rules.
+
 ### Changed
 
+- A pandas float column that contains nulls and holds only whole numbers is
+  read as `integer`. pandas promotes integer columns to `float64` the moment a
+  null appears, and treating that storage artifact as a type violation would
+  fail contracts for reasons unrelated to their data. Narrowly scoped: a float
+  column *without* nulls is taken at face value, so genuine float data is never
+  quietly accepted where an integer was required.
 - `ValidationReport` deliberately defines no `__bool__`. It would have to mean
   either "is valid" or "has violations" — opposites — while `__len__` already
   implies the second. Callers say `report.is_valid`.

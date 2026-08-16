@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from mlcontract.adapters.mapping import CsvSource, MappingSource
-from mlcontract.exceptions import MLC902, ContractValidationError, missing_dependency
+from mlcontract.exceptions import MLC902, ContractValidationError
 
 if TYPE_CHECKING:
     from mlcontract._protocols import DataSource
@@ -50,11 +50,12 @@ def resolve(data: Any, contract: Contract) -> DataSource:
         return _resolve_path(Path(data), contract)
 
     if _looks_like_a_dataframe(data):
-        raise missing_dependency(
-            package="pandas",
-            extra="pandas",
-            purpose="Validating pandas DataFrames",
-        )
+        # Imported here, never at module scope, so the core install never pulls
+        # pandas in. The extra's absence surfaces as install guidance rather
+        # than an ImportError from somewhere unrelated.
+        from mlcontract.adapters.pandas import PandasSource
+
+        return PandasSource(data)
 
     if isinstance(data, Sequence) and not isinstance(data, (str, bytes)):
         if all(isinstance(row, Mapping) for row in data):
