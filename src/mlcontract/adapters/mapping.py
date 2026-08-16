@@ -92,7 +92,10 @@ class CsvSource:
         path: The file to read.
         contract: Supplies the types the file itself cannot carry.
         delimiter: Field separator.
-        encoding: Text encoding.
+        encoding: Text encoding. Defaults to ``utf-8-sig``, which strips a
+            byte-order mark if present and is identical to plain UTF-8 if not.
+            Windows tools write UTF-8 with a BOM by default, and without this
+            the mark is absorbed into the first column's name.
     """
 
     def __init__(

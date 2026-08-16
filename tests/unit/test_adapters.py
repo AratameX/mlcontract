@@ -252,3 +252,38 @@ class TestCustomAdapter:
             Liar({"a": [1.0, "not a number", -5.0]})
         )
         assert [v.code.code for v in report.violations] == ["MLC203"]
+
+
+class TestByteOrderMarks:
+    """Windows tools write UTF-8 with a BOM by default.
+
+    Excel, Notepad and PowerShell's Out-File all do it. Without handling, the
+    mark is absorbed into the first column's name, producing a header like
+    "\ufeffid" that silently matches nothing in the contract.
+    """
+
+    def test_a_bom_is_stripped_from_the_header(self, tmp_path):
+        path = tmp_path / "bom.csv"
+        path.write_text("id,age\n1,30\n", encoding="utf-8-sig")
+        source = CsvSource(path, contract(Feature("id", DType.INTEGER)))
+        assert source.column_names() == ("id", "age")
+
+    def test_data_with_a_bom_validates(self, tmp_path):
+        path = tmp_path / "bom.csv"
+        path.write_text("id,age\n1,30\n", encoding="utf-8-sig")
+        report = contract(Feature("id", DType.INTEGER), Feature("age", DType.INTEGER)).validate(
+            path
+        )
+        assert report.is_valid
+
+    def test_a_file_without_a_bom_is_unaffected(self, tmp_path):
+        path = tmp_path / "plain.csv"
+        path.write_text("id,age\n1,30\n", encoding="utf-8")
+        source = CsvSource(path, contract(Feature("id", DType.INTEGER)))
+        assert source.column_names() == ("id", "age")
+
+    def test_non_ascii_content_survives(self, tmp_path):
+        path = tmp_path / "bom.csv"
+        path.write_text("city\nBengalūru\n", encoding="utf-8-sig")
+        source = CsvSource(path, contract(Feature("city", DType.STRING)))
+        assert list(source.iter_values("city")) == [(0, "Bengalūru")]

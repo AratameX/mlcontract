@@ -58,7 +58,10 @@ def infer_from_csv(
         name: Contract name. Defaults to the file's stem.
         version: Starting version.
         delimiter: Field separator.
-        encoding: Text encoding.
+        encoding: Text encoding. Defaults to ``utf-8-sig``, which strips a
+            byte-order mark if present and is identical to plain UTF-8 if not.
+            Windows tools write UTF-8 with a BOM by default, and without this
+            the mark is absorbed into the first column's name.
         infer_ranges: Whether to read ``min`` and ``max`` off the observed
             values. Off by default: a range taken from a sample rejects
             legitimate data as soon as something slightly larger appears.

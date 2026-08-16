@@ -1,0 +1,62 @@
+site_name: mlcontract
+site_description: Executable contracts for ML systems.
+site_url: https://AratameX.github.io/mlcontract/
+repo_url: https://github.com/AratameX/mlcontract
+repo_name: AratameX/mlcontract
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: {icon: material/weather-night, name: Switch to dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: {icon: material/weather-sunny, name: Switch to light mode}
+
+plugins:
+  - search
+  # mkdocstrings reads the API reference straight from the docstrings, so the
+  # documented API cannot drift from the implemented one.
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            show_root_heading: true
+            members_order: source
+            separate_signature: true
+
+markdown_extensions:
+  - admonition
+  - toc: {permalink: true}
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+  - tables
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+  - Guides:
+      - Writing contracts: guides/contracts.md
+      - Validating data: guides/validation.md
+      - Breaking changes: guides/compatibility.md
+      - Command line: guides/cli.md
+  - Reference:
+      - Python API: reference/api.md
+      - Error codes: reference/errors.md
+  - Development:
+      - Architecture: development/architecture.md
+      - Contributing: development/contributing.md
+
+strict: true

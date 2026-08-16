@@ -64,6 +64,20 @@ contract format carries its own `spec_version`.
 - Errors are written to stderr, so `--format json` on stdout stays parseable
   even when a command fails.
 
+- Documentation site built with MkDocs Material and mkdocstrings, so the API
+  reference is generated from the docstrings and cannot drift from the code.
+- Five runnable examples in `examples/`, each executed by CI with assertions on
+  their output. An example that is never run stops being documentation and
+  becomes a claim nobody checks.
+- `scripts/generate_error_docs.py` renders the error-code reference from the
+  registry; CI fails if the committed page is stale.
+- `docs.yml` workflow: builds with `--strict`, so a broken internal link fails
+  the build.
+- CI now runs on macOS and Windows as well as Linux. The full Python matrix
+  stays on Linux; the other two get one version each, because the bugs they
+  catch are about paths, encodings and line endings rather than language
+  versions.
+
 ### Changed
 
 - A pandas float column that contains nulls and holds only whole numbers is
@@ -72,6 +86,14 @@ contract format carries its own `spec_version`.
   fail contracts for reasons unrelated to their data. Narrowly scoped: a float
   column *without* nulls is taken at face value, so genuine float data is never
   quietly accepted where an integer was required.
+- `mkdocs` is pinned below 2.0: that release removes the plugin and theming
+  systems with no migration path.
+- CSV and contract files are read as `utf-8-sig` rather than `utf-8`, so a
+  byte-order mark is stripped instead of absorbed. Windows tools — Excel,
+  Notepad, PowerShell's `Out-File` — write UTF-8 with a BOM by default, and
+  without this the mark became part of the first column's name, producing a
+  header like `"\ufeffid"` that silently matched nothing. Found by running the
+  CLI by hand on Windows; no Linux test could have caught it.
 - `mlcontract.cli.__init__` no longer re-exports the `main` function. Binding it
   there shadowed the `main` submodule of the same name, so even
   `import mlcontract.cli.main` returned the function.

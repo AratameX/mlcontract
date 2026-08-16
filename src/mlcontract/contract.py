@@ -587,6 +587,8 @@ class Contract:
         """
         location = Path(path)
         try:
+            # utf-8-sig, not utf-8: a contract file edited in a Windows editor may
+            # carry a byte-order mark, and json.loads rejects one outright.
             text = location.read_text(encoding="utf-8-sig")
         except OSError as exc:
             raise ContractDefinitionError(
