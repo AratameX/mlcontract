@@ -629,3 +629,31 @@ class TestYamlFormat:
         assert run("validate", workspace / "contract.yaml", workspace / "bad.csv") == run(
             "validate", workspace / "contract.json", workspace / "bad.csv"
         )
+
+
+class TestWindowsEncodings:
+    """CSVs and contracts written by Windows tools carry a byte-order mark."""
+
+    def test_init_ignores_a_bom_in_the_header(self, tmp_path):
+        from mlcontract._inference import infer_from_csv
+
+        path = tmp_path / "people.csv"
+        path.write_text("id,age,country\n1,30,IN\n", encoding="utf-8-sig")
+        assert infer_from_csv(path).feature_names == ("id", "age", "country")
+
+    def test_the_full_round_trip_survives_a_bom(self, tmp_path, monkeypatch):
+        """Init then validate, exactly as a user on Windows would run it."""
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "people.csv").write_text(
+            "id,age,country\n1,30,IN\n2,41,US\n", encoding="utf-8-sig"
+        )
+        assert run("init", "--from-csv", "people.csv", "--output", "c.json") == (ExitCode.SUCCESS)
+        assert run("validate", "c.json", "people.csv") == ExitCode.SUCCESS
+
+    def test_a_contract_file_with_a_bom_loads(self, tmp_path):
+        """json.loads rejects a byte-order mark outright."""
+        from mlcontract import Contract
+
+        path = tmp_path / "c.json"
+        path.write_text(json.dumps(CONTRACT), encoding="utf-8-sig")
+        assert Contract.load(path).name == "people"

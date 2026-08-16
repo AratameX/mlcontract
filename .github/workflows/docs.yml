@@ -1,0 +1,48 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[docs,yaml,pandas]"
+
+      - name: Check the generated error reference is current
+        # The page is rendered from the code's own registry, so it can only go
+        # stale if someone adds a code and forgets to regenerate.
+        run: python scripts/generate_error_docs.py --check
+
+      - name: Build with strict link checking
+        # --strict turns broken internal links and nav references into failures.
+        # Documentation that points at pages which do not exist is worse than
+        # documentation that is missing, because it looks complete.
+        run: mkdocs build --strict
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site/
