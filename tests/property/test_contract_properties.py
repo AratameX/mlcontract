@@ -95,7 +95,20 @@ def contracts(draw: st.DrawFn) -> Contract:
     )
 
 
-SETTINGS = settings(max_examples=150, suppress_health_check=[HealthCheck.too_slow])
+SETTINGS = settings(
+    max_examples=150,
+    suppress_health_check=[HealthCheck.too_slow],
+    # Deadlines are off deliberately. Hypothesis times each example and flags a
+    # test as flaky when the first call is far slower than the rest — which is
+    # exactly what happens here, because the first example pays one-off costs
+    # (importing PyYAML's C extension, warming caches) that later ones do not.
+    # That produced a genuinely random CI failure with no underlying defect.
+    #
+    # These tests assert correctness invariants, not speed. Performance is
+    # measured by the benchmark suite, on stable ground and against a recorded
+    # baseline, which is where a timing regression should surface.
+    deadline=None,
+)
 
 
 @given(contracts())

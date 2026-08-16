@@ -587,7 +587,7 @@ class Contract:
         """
         location = Path(path)
         try:
-            text = location.read_text(encoding="utf-8")
+            text = location.read_text(encoding="utf-8-sig")
         except OSError as exc:
             raise ContractDefinitionError(
                 f"Could not read contract file {location}: {exc.strerror or exc}.",

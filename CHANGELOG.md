@@ -51,6 +51,19 @@ contract format carries its own `spec_version`.
   than as an unrelated removal and addition. Renames are never inferred.
 - Compatibility error codes `MLC601` and `MLC602`, and `CompatibilityError`.
 
+- Command-line interface: `mlcontract validate`, `diff`, `check-compatibility`,
+  `init` and `version`, with `--format text|json` throughout.
+- Documented exit codes, treated as part of the public interface: 0 success,
+  1 data violated the contract, 2 incompatible change, 3 usage error, 4 invalid
+  contract. 1 and 2 are deliberately distinct — "this dataset is bad" and "this
+  schema change breaks your consumers" call for different pipeline responses.
+- `mlcontract init --from-csv` infers a starting contract from existing data.
+  Types generalise, so they are inferred; observed minima and maxima do not, so
+  ranges are opt-in behind `--infer-ranges`.
+- `--no-samples` on validate, for reports written where raw values should not go.
+- Errors are written to stderr, so `--format json` on stdout stays parseable
+  even when a command fails.
+
 ### Changed
 
 - A pandas float column that contains nulls and holds only whole numbers is
@@ -59,6 +72,9 @@ contract format carries its own `spec_version`.
   fail contracts for reasons unrelated to their data. Narrowly scoped: a float
   column *without* nulls is taken at face value, so genuine float data is never
   quietly accepted where an integer was required.
+- `mlcontract.cli.__init__` no longer re-exports the `main` function. Binding it
+  there shadowed the `main` submodule of the same name, so even
+  `import mlcontract.cli.main` returned the function.
 - `ValidationReport` deliberately defines no `__bool__`. It would have to mean
   either "is valid" or "has violations" — opposites — while `__len__` already
   implies the second. Callers say `report.is_valid`.
