@@ -16,7 +16,7 @@ import re
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from mlcontract import serialization
 from mlcontract.constraints import CONSTRAINTS
@@ -37,6 +37,9 @@ from mlcontract.exceptions import (
     MLC014,
     ContractDefinitionError,
 )
+
+if TYPE_CHECKING:
+    from mlcontract.report import ValidationReport
 
 SPEC_VERSION = "1"
 """The contract *file format* version written by this release.
@@ -611,7 +614,60 @@ class Contract:
         )
         return location
 
-    # -- validation ------------------------------------------------------
+    # -- validating data -------------------------------------------------
+
+    def validate(
+        self,
+        data: Any,
+        *,
+        sample_values: bool = True,
+        max_samples: int = 5,
+    ) -> ValidationReport:
+        """Check data against this contract and return a report.
+
+        Does **not** raise when the data is invalid. A real dataset usually has
+        several problems at once, and raising on the first one turns a single CI
+        run into a queue of them. Call
+        :meth:`~mlcontract.report.ValidationReport.raise_for_status` on the
+        result if you want fail-fast behaviour.
+
+        Args:
+            data: A list of mappings, a path to a ``.csv`` or ``.tsv`` file, or a
+                pandas DataFrame if the ``pandas`` extra is installed.
+            sample_values: Whether violations carry examples of the offending
+                values. Samples make a report far more actionable, but they are
+                raw data — turn this off when reports are written somewhere that
+                should not hold the underlying values, such as a shared log
+                aggregator handling personal data.
+            max_samples: How many examples each violation carries.
+
+        Returns:
+            A report listing every violation found.
+
+        Raises:
+            ContractValidationError: If the data is of a kind no adapter can
+                read. This is a problem with the call, not with the data.
+
+        Example:
+            >>> contract = Contract(
+            ...     name="people",
+            ...     version="1.0.0",
+            ...     features=[Feature("age", DType.INTEGER, min=18)],
+            ... )
+            >>> report = contract.validate([{"age": 30}, {"age": 12}])
+            >>> report.is_valid
+            False
+        """
+        from mlcontract import _engine, adapters
+
+        return _engine.run(
+            self,
+            adapters.resolve(data, self),
+            sample_values=sample_values,
+            max_samples=max_samples,
+        )
+
+    # -- validating the contract itself ----------------------------------
 
     def _by_name(self) -> dict[str, Feature]:
         return {feature.name: feature for feature in self.features}

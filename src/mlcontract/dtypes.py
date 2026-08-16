@@ -89,6 +89,39 @@ class DType(Enum):
         """
         return self is other or (self, other) in _WIDENINGS
 
+    def accepts(self, observed: DType) -> bool:
+        """Return True if data observed as ``observed`` satisfies this declared type.
+
+        This asks a different question from :meth:`widens_to`, and conflating the
+        two is a real source of bugs, so they are separate methods.
+
+        * :meth:`widens_to` is about *contract evolution*: may the declared type
+          change from A to B without breaking existing data?
+        * :meth:`accepts` is about *data conformance*: does a column that turned
+          out to hold B satisfy a contract that declared A?
+
+        They are not inverses and they are not the same relation. A column of
+        plain strings satisfies a ``categorical`` declaration — membership of the
+        allowed set is a separate check — yet ``string`` does not widen to
+        ``categorical``, because narrowing a declaration to a fixed domain
+        rejects data that was previously fine.
+
+        Args:
+            observed: The type the data actually turned out to have.
+
+        Returns:
+            True if the data conforms.
+
+        Example:
+            >>> DType.FLOAT.accepts(DType.INTEGER)
+            True
+            >>> DType.INTEGER.accepts(DType.FLOAT)
+            False
+            >>> DType.CATEGORICAL.accepts(DType.STRING)
+            True
+        """
+        return self is observed or (observed, self) in _ACCEPTED
+
     @classmethod
     def parse(cls, value: str | DType) -> DType:
         """Resolve a type name, accepting common aliases.
@@ -144,6 +177,20 @@ Deliberately conservative. ``INTEGER -> STRING`` is excluded even though any
 integer can be rendered as text: the values survive but comparisons, ordering
 and arithmetic do not, so downstream consumers break.
 """
+
+_ACCEPTED: frozenset[tuple[DType, DType]] = frozenset(
+    {
+        # Integers satisfy a float declaration; the reverse loses precision.
+        (DType.INTEGER, DType.FLOAT),
+        # A categorical column is string-backed, so strings satisfy it. Whether
+        # the values are in the allowed set is a separate constraint.
+        (DType.STRING, DType.CATEGORICAL),
+        (DType.CATEGORICAL, DType.STRING),
+        # A date satisfies a datetime declaration at midnight.
+        (DType.DATE, DType.DATETIME),
+    }
+)
+"""Ordered pairs ``(observed, declared)`` where the observed data conforms."""
 
 _ALIASES: dict[str, DType] = {
     # Canonical names.

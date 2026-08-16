@@ -22,11 +22,19 @@ EXPECTED_PUBLIC_API = frozenset(
         "SPEC_VERSION",
         "Contract",
         "ContractDefinitionError",
+        "ContractValidationError",
         "DType",
         "Feature",
+        "FeatureValidationError",
         "IntegrationError",
         "MLContractError",
+        "Sample",
+        "SchemaValidationError",
+        "Severity",
+        "ValidationReport",
+        "Violation",
         "__version__",
+        "validate",
     }
 )
 
