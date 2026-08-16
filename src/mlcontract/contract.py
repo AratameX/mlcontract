@@ -39,6 +39,8 @@ from mlcontract.exceptions import (
 )
 
 if TYPE_CHECKING:
+    from mlcontract.compatibility import Compatibility, CompatibilityResult
+    from mlcontract.diff import ContractDiff
     from mlcontract.report import ValidationReport
 
 SPEC_VERSION = "1"
@@ -666,6 +668,52 @@ class Contract:
             sample_values=sample_values,
             max_samples=max_samples,
         )
+
+    # -- comparing versions ----------------------------------------------
+
+    def diff(self, other: Contract) -> ContractDiff:
+        """Return every difference between this contract and a later one.
+
+        Direction matters: ``v1.diff(v2)`` describes moving from this contract
+        to ``other``, and reversing them gives a different answer.
+
+        Args:
+            other: The later contract.
+
+        Returns:
+            Every difference, each classified by its effect on which data is
+            accepted, along with the semantic-version bump the changes require.
+
+        Example:
+            >>> changes = v1.diff(v2)
+            >>> changes.is_breaking
+            True
+        """
+        from mlcontract.diff import compare
+
+        return compare(self, other)
+
+    def is_compatible_with(
+        self,
+        other: Contract,
+        mode: Compatibility | str = "backward",
+    ) -> CompatibilityResult:
+        """Check whether moving from this contract to ``other`` is compatible.
+
+        Args:
+            other: The later contract.
+            mode: ``"backward"`` (can the new contract read old data?),
+                ``"forward"`` (can the old contract read new data?), or
+                ``"full"`` (both). Backward by default.
+
+        Returns:
+            The outcome, naming which changes broke it and in which direction.
+            Call ``raise_for_status()`` on it to fail fast instead.
+        """
+        from mlcontract.compatibility import Compatibility as _Mode
+        from mlcontract.compatibility import check
+
+        return check(self, other, _Mode(mode) if isinstance(mode, str) else mode)
 
     # -- validating the contract itself ----------------------------------
 
