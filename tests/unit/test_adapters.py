@@ -8,6 +8,7 @@ import pytest
 
 from mlcontract import Contract, ContractValidationError, DType, Feature, IntegrationError
 from mlcontract.adapters import CsvSource, MappingSource, resolve
+from tests._support import requires_no_pandas
 
 
 def contract(*features: Feature) -> Contract:
@@ -180,6 +181,7 @@ class TestResolve:
             resolve(42, contract(Feature("a", DType.INTEGER)))
         assert exc.value.code.code == "MLC902"
 
+    @requires_no_pandas
     def test_dataframe_without_the_extra_names_the_extra(self):
         """Duck-typed so the core never imports pandas to detect pandas."""
 
