@@ -12,8 +12,7 @@ import json
 import pytest
 
 from mlcontract import SPEC_VERSION, Contract, ContractDefinitionError, DType, Feature
-
-yaml = pytest.importorskip("yaml", reason="requires the 'yaml' extra")
+from tests._support import requires_yaml
 
 
 def rich_contract() -> Contract:
@@ -94,6 +93,7 @@ class TestJson:
         assert "line" in str(exc.value)
 
 
+@requires_yaml
 class TestYaml:
     def test_round_trip(self):
         contract = rich_contract()
@@ -112,6 +112,7 @@ class TestYaml:
         assert exc.value.code.code == "MLC010"
 
 
+@requires_yaml
 class TestFormatEquivalence:
     """The guarantee that JSON and YAML are not two contract systems."""
 
@@ -156,7 +157,14 @@ class TestFormatEquivalence:
 
 
 class TestFiles:
-    @pytest.mark.parametrize("suffix", [".json", ".yaml", ".yml"])
+    @pytest.mark.parametrize(
+        "suffix",
+        [
+            ".json",
+            pytest.param(".yaml", marks=requires_yaml),
+            pytest.param(".yml", marks=requires_yaml),
+        ],
+    )
     def test_save_and_load(self, tmp_path, suffix):
         contract = rich_contract()
         path = contract.save(tmp_path / f"contract{suffix}")
@@ -172,6 +180,7 @@ class TestFiles:
             rich_contract().save(tmp_path / "contract.txt")
         assert exc.value.code.code == "MLC010"
 
+    @requires_yaml
     def test_unknown_extension_on_load(self, tmp_path):
         path = tmp_path / "contract.txt"
         path.write_text("name: x")
@@ -261,6 +270,7 @@ class TestFormatSniffing:
 
         assert decode_text('{"name": "x"}') == {"name": "x"}
 
+    @requires_yaml
     def test_anything_else_is_treated_as_yaml(self):
         from mlcontract.serialization import decode_text
 

@@ -51,6 +51,9 @@ contract format carries its own `spec_version`.
 - Property-based tests covering round-trip losslessness, JSON/YAML equivalence
   and serialisation determinism.
 
+- CI now runs the test matrix in two dependency shapes, core-only and full, so
+  the dependency-free core is verified rather than assumed.
+
 ### Fixed
 
 - Zero-valued constraints (`min=0`, `max=0`, `max_null_fraction=0.0`) were
@@ -58,6 +61,9 @@ contract format carries its own `spec_version`.
   test `value in (None, False)` true. They were dropped from serialised
   contracts and skipped during applicability checking. Found by the property
   tests before any release.
+- Optional-dependency tests were skipped a whole module at a time, which
+  silently dropped the JSON serialisation tests in environments without PyYAML
+  even though they need no YAML. Skipping is now per-test.
 
 ### Compatibility
 

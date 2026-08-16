@@ -13,13 +13,11 @@ from __future__ import annotations
 
 from typing import Any
 
-import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from mlcontract import Contract, DType, Feature
-
-yaml = pytest.importorskip("yaml", reason="requires the 'yaml' extra")
+from tests._support import requires_yaml
 
 # Identifiers that are legal feature names and survive both encodings.
 names = st.from_regex(r"\A[a-z][a-z0-9_]{0,20}\Z", fullmatch=True)
@@ -114,12 +112,14 @@ def test_json_round_trip_is_lossless(contract):
 
 @given(contracts())
 @SETTINGS
+@requires_yaml
 def test_yaml_round_trip_is_lossless(contract):
     assert Contract.from_yaml(contract.to_yaml()) == contract
 
 
 @given(contracts())
 @SETTINGS
+@requires_yaml
 def test_json_and_yaml_are_the_same_contract_system(contract):
     """The core guarantee: two encodings, one representation.
 
@@ -137,6 +137,7 @@ def test_serialisation_is_deterministic(contract):
 
 @given(contracts())
 @SETTINGS
+@requires_yaml
 def test_feature_order_survives_every_encoding(contract):
     assert Contract.from_yaml(contract.to_yaml()).feature_names == contract.feature_names
 
