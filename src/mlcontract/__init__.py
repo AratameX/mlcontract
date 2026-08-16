@@ -22,9 +22,12 @@ Example:
 from __future__ import annotations
 
 from mlcontract._version import __version__
+from mlcontract.compatibility import Compatibility, CompatibilityResult
 from mlcontract.contract import SPEC_VERSION, Contract, Feature
+from mlcontract.diff import Change, ChangeKind, ContractDiff, Impact, VersionBump
 from mlcontract.dtypes import DType
 from mlcontract.exceptions import (
+    CompatibilityError,
     ContractDefinitionError,
     ContractValidationError,
     FeatureValidationError,
@@ -62,18 +65,26 @@ def validate(
 
 __all__ = [
     "SPEC_VERSION",
+    "Change",
+    "ChangeKind",
+    "Compatibility",
+    "CompatibilityError",
+    "CompatibilityResult",
     "Contract",
     "ContractDefinitionError",
+    "ContractDiff",
     "ContractValidationError",
     "DType",
     "Feature",
     "FeatureValidationError",
+    "Impact",
     "IntegrationError",
     "MLContractError",
     "Sample",
     "SchemaValidationError",
     "Severity",
     "ValidationReport",
+    "VersionBump",
     "Violation",
     "__version__",
     "validate",

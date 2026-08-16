@@ -117,6 +117,13 @@ MLC207 = ErrorCode("MLC207", "Duplicate values in a feature declared unique")
 MLC208 = ErrorCode("MLC208", "Values whose type does not match the contract")
 
 # --------------------------------------------------------------------------
+# MLC6xx — compatibility
+# --------------------------------------------------------------------------
+
+MLC601 = ErrorCode("MLC601", "A change breaks compatibility in the direction checked")
+MLC602 = ErrorCode("MLC602", "The declared version increment is smaller than the changes require")
+
+# --------------------------------------------------------------------------
 # MLC9xx — integrations
 # --------------------------------------------------------------------------
 
@@ -218,6 +225,26 @@ class SchemaValidationError(ContractValidationError):
 
 class FeatureValidationError(ContractValidationError):
     """Individual values violate the constraints declared for their feature."""
+
+
+class CompatibilityError(MLContractError):
+    """A contract change is not compatible in the direction that was required.
+
+    Raised only when a caller asks for it, via
+    :meth:`~mlcontract.compatibility.CompatibilityResult.raise_for_status`.
+    Comparing contracts returns a result by default, because knowing *which*
+    changes broke compatibility is the entire point.
+
+    Attributes:
+        result: The full
+            :class:`~mlcontract.compatibility.CompatibilityResult`.
+    """
+
+    def __init__(
+        self, message: str, *, code: ErrorCode, result: Any = None, **context: Any
+    ) -> None:
+        super().__init__(message, code=code, **context)
+        self.result = result
 
 
 class IntegrationError(MLContractError):

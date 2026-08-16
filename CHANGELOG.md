@@ -37,6 +37,20 @@ contract format carries its own `spec_version`.
 - pandas' four spellings of missing — `NaN`, `None`, `NaT` and `pd.NA` — are all
   handled by delegating to `isna` rather than reimplementing the rules.
 
+- Contract diffing. `old.diff(new)` returns every difference, each classified
+  by whether it admits more data (`RELAXED`), less (`TIGHTENED`), or neither
+  (`NEUTRAL`). Tightened is exactly what "breaking" means.
+- Directional compatibility. `old.is_compatible_with(new, mode)` answers
+  `backward` (can the new contract read old data?), `forward` (can the old
+  contract read new data?), or `full`. A single boolean cannot express this:
+  adding a required field breaks producers and not consumers.
+- Implied semantic-version bumps. `diff.required_bump` is derived from the
+  changes, and `is_version_bump_sufficient` catches a breaking change shipped
+  as a patch release — the check worth putting in CI.
+- Declared renames via `previous_names` are reported once as a rename rather
+  than as an unrelated removal and addition. Renames are never inferred.
+- Compatibility error codes `MLC601` and `MLC602`, and `CompatibilityError`.
+
 ### Changed
 
 - A pandas float column that contains nulls and holds only whole numbers is
