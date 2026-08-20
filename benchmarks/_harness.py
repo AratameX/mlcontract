@@ -83,7 +83,14 @@ class Suite:
         target.mkdir(parents=True, exist_ok=True)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         path = target / f"{stamp}.json"
-        path.write_text(json.dumps(self.to_dict(), indent=2) + "\n", encoding="utf-8")
+        # newline="\n" rather than the platform default. .gitattributes mandates
+        # LF, so writing CRLF on Windows would make the pre-commit hook rewrite
+        # every results file and abort the commit.
+        path.write_text(
+            json.dumps(self.to_dict(), indent=2) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
         return path
 
 
