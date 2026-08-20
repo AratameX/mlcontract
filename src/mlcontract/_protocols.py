@@ -23,10 +23,83 @@ now, since a fast-path interface invented without one tends not to fit.
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Collection, Iterator, Sequence
+from dataclasses import dataclass
 from typing import Any, Protocol, runtime_checkable
 
 from mlcontract.dtypes import DType
+
+
+@dataclass(frozen=True, slots=True)
+class Failures:
+    """What a single value check found, without materialising every offender.
+
+    Separating the count from the samples is deliberate. A report needs the
+    exact number of affected rows and only a handful of examples, so keeping
+    every offending pair to show five of them wastes memory in proportion to how
+    broken the data is — worst exactly when the dataset is largest.
+
+    Attributes:
+        count: How many rows failed, in full.
+        samples: Up to the caller's limit of ``(row, value)`` pairs.
+        extreme: The furthest offending value, for bounds checks. None when the
+            check has no natural extreme.
+        distinct: Distinct offending values, for domain and uniqueness checks,
+            capped by the producer.
+    """
+
+    count: int
+    samples: tuple[tuple[int, Any], ...] = ()
+    extreme: Any = None
+    distinct: tuple[Any, ...] = ()
+
+    @property
+    def any(self) -> bool:
+        """Return True if anything failed."""
+        return self.count > 0
+
+
+@runtime_checkable
+class VectorisedSource(Protocol):
+    """An optional fast path for backends that evaluate whole columns at once.
+
+    The engine's default is to iterate a column in Python, which is correct for
+    every backend and slow for the ones that could do better. A source
+    implementing any of these methods gets that check evaluated in one
+    vectorised operation instead.
+
+    Every method may return ``None``, meaning "no fast path for this" — the
+    engine then falls back to iteration. That makes the protocol genuinely
+    optional per check: an adapter can accelerate what it can express and ignore
+    the rest, rather than facing an all-or-nothing implementation.
+
+    The results must be *identical* to what iteration would produce, not merely
+    similar. Tests assert that the two paths agree on the same data, because a
+    fast path that quietly disagrees with the slow one is worse than no fast
+    path at all.
+    """
+
+    def failing_below(self, column: str, minimum: float, *, limit: int) -> Failures | None:
+        """Rows whose value is below an inclusive minimum."""
+        ...
+
+    def failing_above(self, column: str, maximum: float, *, limit: int) -> Failures | None:
+        """Rows whose value is above an inclusive maximum."""
+        ...
+
+    def failing_outside(
+        self, column: str, allowed: Collection[Any], *, limit: int
+    ) -> Failures | None:
+        """Rows whose value is not in the permitted domain."""
+        ...
+
+    def failing_pattern(self, column: str, pattern: str, *, limit: int) -> Failures | None:
+        """Rows whose value does not fully match a regular expression."""
+        ...
+
+    def failing_duplicates(self, column: str, *, limit: int) -> Failures | None:
+        """Rows holding a value that appears more than once."""
+        ...
 
 
 @runtime_checkable
