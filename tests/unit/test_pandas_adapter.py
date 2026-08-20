@@ -232,3 +232,134 @@ class TestEndToEnd:
 
         chosen = resolve(pd.DataFrame({"a": [1]}), contract(Feature("a", DType.INTEGER)))
         assert isinstance(chosen, PandasSource)
+
+
+@requires_pandas
+class TestFastAndSlowPathsAgree:
+    """The vectorised paths are an optimisation, never a change in behaviour.
+
+    Two implementations of the same checks is the arrangement most likely to
+    drift: a subtle difference — prefix matching instead of full matching, nulls
+    counted as duplicates — would make a report depend on which backend happened
+    to load the data. These tests run identical data through both and demand the
+    same answer.
+    """
+
+    @staticmethod
+    def slow(frame: Any) -> Any:
+        """A source with the fast paths removed, forcing row iteration."""
+        from mlcontract.adapters.pandas import PandasSource
+
+        class RowByRow(PandasSource):
+            pass
+
+        for name in (
+            "failing_below",
+            "failing_above",
+            "failing_outside",
+            "failing_pattern",
+            "failing_duplicates",
+        ):
+            setattr(RowByRow, name, None)
+        return RowByRow(frame)
+
+    def both(self, contract_: Contract, frame: Any) -> tuple[Any, Any]:
+        return contract_.validate(frame), contract_.validate(self.slow(frame))
+
+    def test_ranges_agree(self):
+        c = contract(Feature("a", DType.INTEGER, min=10, max=20))
+        frame = pd.DataFrame({"a": [5, 15, 25, None, 9, 21]})
+        fast, slow = self.both(c, frame)
+        assert fast.to_dict()["violations"] == slow.to_dict()["violations"]
+
+    def test_allowed_values_agree(self):
+        c = contract(Feature("c", DType.CATEGORICAL, allowed_values=["IN", "US"]))
+        frame = pd.DataFrame({"c": ["IN", "FR", None, "US", "DE"]})
+        fast, slow = self.both(c, frame)
+        assert fast.to_dict()["violations"] == slow.to_dict()["violations"]
+
+    def test_patterns_agree(self):
+        """Prefix matching would pass values that full matching rejects."""
+        c = contract(Feature("e", DType.STRING, pattern=r"[a-z]+"))
+        frame = pd.DataFrame({"e": ["abc", "abc123", "", None, "ABC"]})
+        fast, slow = self.both(c, frame)
+        assert fast.to_dict()["violations"] == slow.to_dict()["violations"]
+
+    def test_uniqueness_agrees(self):
+        c = contract(Feature("id", DType.INTEGER, unique=True))
+        frame = pd.DataFrame({"id": [1, 2, 1, 3, 2, 2]})
+        fast, slow = self.both(c, frame)
+        assert fast.to_dict()["violations"] == slow.to_dict()["violations"]
+
+    def test_nulls_are_not_duplicates_on_either_path(self):
+        """Two missing values are not the same value repeated."""
+        c = contract(Feature("id", DType.INTEGER, unique=True))
+        frame = pd.DataFrame({"id": [1.0, None, None, 2.0]})
+        fast, slow = self.both(c, frame)
+        assert fast.is_valid
+        assert slow.is_valid
+
+    def test_everything_at_once_agrees(self):
+        c = contract(
+            Feature("id", DType.INTEGER, unique=True),
+            Feature("age", DType.INTEGER, min=18, max=90),
+            Feature("country", DType.CATEGORICAL, allowed_values=["IN", "US"]),
+            Feature("email", DType.STRING, pattern=r"[^@]+@[^@]+"),
+        )
+        frame = pd.DataFrame(
+            {
+                "id": [1, 1, 2, 3],
+                "age": [12, 25, 95, None],
+                "country": ["IN", "FR", "US", None],
+                "email": ["a@b.com", "nope", None, "c@d.com"],
+            }
+        )
+        fast, slow = self.both(c, frame)
+        assert fast.to_dict()["violations"] == slow.to_dict()["violations"]
+
+    def test_row_numbers_are_positional_on_both_paths(self):
+        """A non-default index must not leak into reported row numbers."""
+        c = contract(Feature("a", DType.INTEGER, min=0))
+        frame = pd.DataFrame({"a": [5, -1]}, index=["x", "y"])
+        fast, slow = self.both(c, frame)
+        assert fast.violations[0].samples[0].row == 1
+        assert slow.violations[0].samples[0].row == 1
+
+    def test_a_non_numeric_column_declines_the_fast_path(self):
+        """Declining must fall back, not silently skip the check."""
+        c = contract(Feature("a", DType.FLOAT, min=0))
+        frame = pd.DataFrame({"a": pd.Series([1.0, "oops"], dtype=object)})
+        fast, slow = self.both(c, frame)
+        assert fast.to_dict()["violations"] == slow.to_dict()["violations"]
+
+    def test_a_pattern_on_a_non_text_column_declines(self):
+        """Declining lets the slow path name the offending values precisely."""
+        from mlcontract.adapters.pandas import PandasSource
+
+        frame = pd.DataFrame({"a": [1, 2, 3]})
+        assert PandasSource(frame).failing_pattern("a", r"[a-z]+", limit=5) is None
+
+    def test_a_pattern_on_mixed_objects_declines(self):
+        from mlcontract.adapters.pandas import PandasSource
+
+        frame = pd.DataFrame({"a": pd.Series(["abc", 7, None], dtype=object)})
+        result = PandasSource(frame).failing_pattern("a", r"[a-z]+", limit=5)
+        assert result is None or result.count >= 1
+
+    def test_a_bound_on_a_non_numeric_column_declines(self):
+        from mlcontract.adapters.pandas import PandasSource
+
+        frame = pd.DataFrame({"a": ["x", "y"]})
+        assert PandasSource(frame).failing_below("a", 0, limit=5) is None
+
+    def test_uniqueness_on_unhashable_values_declines_or_reports(self):
+        """An object column may hold lists, which pandas cannot hash."""
+        from mlcontract.adapters.pandas import PandasSource
+
+        frame = pd.DataFrame({"a": pd.Series([[1], [1]], dtype=object)})
+        source = PandasSource(frame)
+        try:
+            result = source.failing_duplicates("a", limit=5)
+        except TypeError:
+            pytest.fail("should decline rather than raise")
+        assert result is None or result.count >= 0

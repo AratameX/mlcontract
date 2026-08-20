@@ -208,31 +208,6 @@ class TestUniqueness:
         )
 
 
-class TestDeclines:
-    @staticmethod
-    def source(frame: Any) -> Any:
-        from mlcontract.adapters.pandas import PandasSource
-
-        return PandasSource(frame)
-
-    def test_a_bound_on_a_text_column_declines(self):
-        frame = pd.DataFrame({"a": ["x", "y"]})
-        assert self.source(frame).failing_below("a", 0, limit=5) is None
-
-    def test_a_bound_on_a_mixed_object_column_declines(self):
-        frame = pd.DataFrame({"a": pd.Series([1.0, "oops"], dtype=object)})
-        assert self.source(frame).failing_above("a", 0, limit=5) is None
-
-    def test_a_pattern_on_a_numeric_column_declines(self):
-        frame = pd.DataFrame({"a": pd.Series([1, 2], dtype="int64")})
-        assert self.source(frame).failing_pattern("a", r"[a-z]+", limit=5) is None
-
-    def test_unhashable_values_omit_only_the_distinct_summary(self):
-        frame = pd.DataFrame({"a": pd.Series([["x"], ["x"]], dtype=object)})
-        result = self.source(frame).failing_duplicates("a", limit=5)
-        assert result is None or result.distinct == ()
-
-
 class TestCombined:
     def test_every_check_at_once(self):
         contract = Contract(

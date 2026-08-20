@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # Actions pinned to a major tag still move underneath you; this surfaces the
+  # moves rather than letting them happen silently.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "chore"
+    labels: [dependencies]
+
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "chore"
+    labels: [dependencies]
+    # The core has no runtime dependencies, so these are development tools.
+    # Grouped because a week of individual ruff and mypy bumps is noise.
+    groups:
+      dev-tooling:
+        patterns: ["ruff", "mypy", "pytest*", "hypothesis", "pre-commit", "coverage*"]
+      docs:
+        patterns: ["mkdocs*", "mkdocstrings*"]
