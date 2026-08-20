@@ -1,0 +1,68 @@
+name: Performance
+
+on:
+  schedule:
+    # Weekly, not per-commit. Shared CI runners vary enough between jobs that
+    # per-commit timings would produce more false regressions than real ones.
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+  pull_request:
+    # Only when the benchmarks or the code paths they measure change.
+    paths:
+      - "benchmarks/**"
+      - "src/mlcontract/_engine.py"
+      - "src/mlcontract/adapters/**"
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          # pandera is installed only here: it exists to make the comparison
+          # honest, and has no place in the package's own dependency tree.
+          pip install -e ".[yaml,pandas]" pandera
+
+      - name: Run benchmarks
+        run: python benchmarks/run_all.py
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: benchmarks/results/
+          retention-days: 90
+
+  smoke:
+    name: Benchmarks run at all
+    # A fast job on every relevant change. It does not check timings — only that
+    # the suite still executes, so a refactor cannot silently break the
+    # measurement code and go unnoticed until the weekly run.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[yaml,pandas]"
+
+      - name: Quick run
+        run: python benchmarks/run_all.py --quick --no-save

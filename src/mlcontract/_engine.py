@@ -22,9 +22,10 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from collections.abc import Callable, Sequence
 from typing import Any
 
-from mlcontract._protocols import DataSource, column_values
+from mlcontract._protocols import DataSource, Failures, column_values
 from mlcontract.contract import Contract, Feature
 from mlcontract.exceptions import (
     MLC101,
@@ -99,11 +100,73 @@ class _Settings:
         self.sample_values = sample_values
         self.max_samples = max_samples
 
-    def take(self, pairs: list[tuple[int, Any]]) -> tuple[Sample, ...]:
+    def take(self, pairs: Sequence[tuple[int, Any]]) -> tuple[Sample, ...]:
         """Return up to ``max_samples`` samples, or none if samples are disabled."""
         if not self.sample_values:
             return ()
         return tuple(Sample(row=row, value=value) for row, value in pairs[: self.max_samples])
+
+
+def _scan(
+    source: DataSource,
+    column: str,
+    predicate: Callable[[Any], bool],
+    *,
+    limit: int,
+    track_extreme: str | None = None,
+    track_distinct: bool = False,
+) -> Failures:
+    """Iterate a column, counting failures but retaining only a few samples.
+
+    The fallback used whenever a source offers no vectorised path. Counting
+    without accumulating means memory stays flat no matter how broken the data
+    is, which matters most on exactly the datasets where it is worst.
+    """
+    count = 0
+    samples: list[tuple[int, Any]] = []
+    extreme: Any = None
+    distinct: set[Any] = set()
+
+    for row, value in source.iter_values(column):
+        if not predicate(value):
+            continue
+        count += 1
+        if len(samples) < limit:
+            samples.append((row, value))
+        if track_extreme is not None:
+            if extreme is None:
+                extreme = value
+            elif track_extreme == "min":
+                extreme = min(extreme, value)
+            else:
+                extreme = max(extreme, value)
+        if track_distinct and len(distinct) < _DISTINCT_LIMIT:
+            distinct.add(value)
+
+    return Failures(
+        count=count,
+        samples=tuple(samples),
+        extreme=extreme,
+        distinct=tuple(sorted(distinct, key=str)),
+    )
+
+
+def _fast(source: DataSource, method: str, *args: Any, limit: int) -> Failures | None:
+    """Try a source's vectorised path for one check.
+
+    Returns None when the source does not implement it, or implements it but
+    declines this particular case — in both situations the caller falls back to
+    iteration.
+    """
+    handler = getattr(source, method, None)
+    if handler is None:
+        return None
+    result = handler(*args, limit=limit)
+    return result if isinstance(result, Failures) else None
+
+
+_DISTINCT_LIMIT = 50
+"""How many distinct offending values to retain for a message."""
 
 
 # --------------------------------------------------------------------------
@@ -316,26 +379,48 @@ def _check_range(feature: Feature, source: DataSource, settings: _Settings) -> l
     if feature.min is None and feature.max is None:
         return []
 
-    below: list[tuple[int, Any]] = []
-    above: list[tuple[int, Any]] = []
-    for row, value in source.iter_values(feature.name):
-        if not isinstance(value, (int, float)) or isinstance(value, bool):
-            continue
-        if feature.min is not None and value < feature.min:
-            below.append((row, value))
-        if feature.max is not None and value > feature.max:
-            above.append((row, value))
-
+    limit = settings.max_samples
     found: list[Violation] = []
-    if below:
-        found.append(
-            _bound_violation(feature, MLC203, "min", feature.min, below, settings, "below")
+
+    if feature.min is not None:
+        minimum = feature.min
+        below = _fast(source, "failing_below", feature.name, minimum, limit=limit) or _scan(
+            source,
+            feature.name,
+            lambda value: _is_number(value) and value < minimum,
+            limit=limit,
+            track_extreme="min",
         )
-    if above:
-        found.append(
-            _bound_violation(feature, MLC204, "max", feature.max, above, settings, "above")
+        if below.any:
+            found.append(
+                _bound_violation(feature, MLC203, "min", minimum, below, settings, "below")
+            )
+
+    if feature.max is not None:
+        maximum = feature.max
+        above = _fast(source, "failing_above", feature.name, maximum, limit=limit) or _scan(
+            source,
+            feature.name,
+            lambda value: _is_number(value) and value > maximum,
+            limit=limit,
+            track_extreme="max",
         )
+        if above.any:
+            found.append(
+                _bound_violation(feature, MLC204, "max", maximum, above, settings, "above")
+            )
+
     return found
+
+
+def _is_number(value: Any) -> bool:
+    """Return True for a value a numeric bound can be compared against.
+
+    Non-numeric values are skipped rather than reported: a column of mixed types
+    has already failed its type check, and comparing a string to a number would
+    raise from inside the comparison.
+    """
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
 def _bound_violation(
@@ -343,23 +428,23 @@ def _bound_violation(
     code: ErrorCode,
     rule: str,
     bound: Any,
-    offenders: list[tuple[int, Any]],
+    failures: Failures,
     settings: _Settings,
     direction: str,
 ) -> Violation:
     """Build the violation for a breached numeric bound."""
-    worst = min(v for _, v in offenders) if direction == "below" else max(v for _, v in offenders)
+    worst = failures.extreme
     return Violation(
         code=code,
         severity=Severity.ERROR,
-        message=f"Column {feature.name!r} has {len(offenders)} value(s) {direction} the "
+        message=f"Column {feature.name!r} has {failures.count} value(s) {direction} the "
         f"declared {rule} of {bound}; furthest is {worst}.",
         feature=feature.name,
         rule=rule,
         expected=bound,
         actual=worst,
-        affected_rows=len(offenders),
-        samples=settings.take(offenders),
+        affected_rows=failures.count,
+        samples=settings.take(failures.samples),
         remediation=f"Clip or filter the offending rows, or relax {rule} if the data is "
         "legitimately wider than the contract assumed.",
     )
@@ -373,25 +458,30 @@ def _check_allowed_values(
         return []
 
     permitted = set(feature.allowed_values)
-    offenders = [
-        (row, value) for row, value in source.iter_values(feature.name) if value not in permitted
-    ]
-    if not offenders:
+    limit = settings.max_samples
+    failures = _fast(source, "failing_outside", feature.name, permitted, limit=limit) or _scan(
+        source,
+        feature.name,
+        lambda value: value not in permitted,
+        limit=limit,
+        track_distinct=True,
+    )
+    if not failures.any:
         return []
 
-    unexpected = sorted({str(value) for _, value in offenders})
+    unexpected = sorted({str(value) for value in failures.distinct})
     return [
         Violation(
             code=MLC205,
             severity=Severity.ERROR,
-            message=f"Column {feature.name!r} has {len(offenders)} value(s) outside the "
+            message=f"Column {feature.name!r} has {failures.count} value(s) outside the "
             f"allowed set. Unexpected: {', '.join(unexpected[:10])}.",
             feature=feature.name,
             rule="allowed_values",
             expected=list(feature.allowed_values),
             actual=unexpected,
-            affected_rows=len(offenders),
-            samples=settings.take(offenders),
+            affected_rows=failures.count,
+            samples=settings.take(failures.samples),
             remediation="A new category upstream is the usual cause. Add it to "
             "allowed_values if legitimate, and bump the contract's minor version.",
         )
@@ -410,26 +500,30 @@ def _check_pattern(feature: Feature, source: DataSource, settings: _Settings) ->
         return []
 
     compiled = re.compile(feature.pattern)
-    offenders = [
-        (row, value)
-        for row, value in source.iter_values(feature.name)
-        if not (isinstance(value, str) and compiled.fullmatch(value))
-    ]
-    if not offenders:
+    limit = settings.max_samples
+    failures = _fast(
+        source, "failing_pattern", feature.name, feature.pattern, limit=limit
+    ) or _scan(
+        source,
+        feature.name,
+        lambda value: not (isinstance(value, str) and compiled.fullmatch(value)),
+        limit=limit,
+    )
+    if not failures.any:
         return []
 
     return [
         Violation(
             code=MLC206,
             severity=Severity.ERROR,
-            message=f"Column {feature.name!r} has {len(offenders)} value(s) that do not match "
+            message=f"Column {feature.name!r} has {failures.count} value(s) that do not match "
             f"the pattern {feature.pattern!r}.",
             feature=feature.name,
             rule="pattern",
             expected=feature.pattern,
             actual=None,
-            affected_rows=len(offenders),
-            samples=settings.take(offenders),
+            affected_rows=failures.count,
+            samples=settings.take(failures.samples),
             remediation="Patterns match the whole value, not a substring. Check the pattern "
             "is anchored as you intend before assuming the data is wrong.",
         )
@@ -441,26 +535,37 @@ def _check_unique(feature: Feature, source: DataSource, settings: _Settings) -> 
     if not feature.unique:
         return []
 
-    counts = Counter(column_values(source, feature.name))
-    repeated = {value for value, count in counts.items() if count > 1}
-    if not repeated:
+    limit = settings.max_samples
+    failures = _fast(source, "failing_duplicates", feature.name, limit=limit)
+
+    if failures is None:
+        counts = Counter(column_values(source, feature.name))
+        repeated = {value for value, count in counts.items() if count > 1}
+        if not repeated:
+            return []
+        failures = _scan(
+            source,
+            feature.name,
+            lambda value: value in repeated,
+            limit=limit,
+            track_distinct=True,
+        )
+
+    if not failures.any:
         return []
 
-    offenders = [
-        (row, value) for row, value in source.iter_values(feature.name) if value in repeated
-    ]
     return [
         Violation(
             code=MLC207,
             severity=Severity.ERROR,
-            message=f"Column {feature.name!r} is declared unique but has {len(repeated)} "
-            f"duplicated value(s) across {len(offenders)} rows.",
+            message=f"Column {feature.name!r} is declared unique but has "
+            f"{len(failures.distinct)} duplicated value(s) across {failures.count} rows.",
             feature=feature.name,
             rule="unique",
             expected="all values distinct",
-            actual=sorted(str(value) for value in repeated)[:10],
-            affected_rows=len(offenders),
-            samples=settings.take(offenders),
+            actual=sorted(str(value) for value in failures.distinct)[:10],
+            affected_rows=failures.count,
+            samples=settings.take(failures.samples),
             remediation="Deduplicate upstream. Duplicate keys usually mean a join fanned out.",
         )
     ]

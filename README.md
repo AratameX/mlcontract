@@ -59,6 +59,28 @@ A breaking change becomes a failed build instead of a production incident.
 - **Renames are declared, never guessed.** A compatibility tool that is
   confidently wrong is worse than one that admits it does not know.
 
+## Performance
+
+Same checks, same data, same machine, 100,000 rows:
+
+| Approach | Median | Peak memory |
+| --- | ---: | ---: |
+| Hand-written pandas assertions | 3.0 ms | 0.5 MB |
+| **mlcontract, pandas adapter** | **12.8 ms** | **0.5 MB** |
+| pandera, lazy validation | 15.8 ms | 3.6 MB |
+
+Around 7.8 million rows/second. Hand-written assertions are faster and always
+will be — they do nothing but compute booleans, while mlcontract returns
+structured violations with error codes, affected-row counts, sampled values and
+remediation text.
+
+Contract operations are effectively free: a diff is 0.05 ms, a full
+compatibility check 0.11 ms.
+
+Every figure comes from `python benchmarks/run_all.py`; see
+[docs/reference/performance.md](docs/reference/performance.md) for methodology
+and the full results.
+
 ## Roadmap
 
 | Version | Scope |

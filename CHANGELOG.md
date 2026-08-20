@@ -78,6 +78,46 @@ contract format carries its own `spec_version`.
   catch are about paths, encodings and line endings rather than language
   versions.
 
+- Benchmark suite in `benchmarks/`, recording contract operations, validation
+  throughput and an honest comparison against hand-written pandas assertions and
+  pandera. Every result embeds the environment that produced it.
+- `performance.yml` workflow: weekly full runs with archived results, plus a
+  fast smoke job so a refactor cannot silently break the measurement code.
+- Performance documentation and a README section, both populated from the
+  recorded results rather than written by hand.
+
+- Optional `VectorisedSource` protocol. A backend may implement per-check
+  methods that evaluate a whole column at once; the engine falls back to
+  iteration for any it does not provide, so correctness never depends on a fast
+  path existing.
+- The pandas adapter implements all five, making validation **12× faster and 6×
+  lighter** — 154 ms to 12.8 ms on 100,000 rows, and 3.1 MB to 0.5 MB — with no
+  change to the engine and no change to what any report says. mlcontract now
+  measures faster than pandera on the same benchmark.
+- Equivalence tests running identical data through both paths and comparing
+  entire reports, because a fast path that quietly disagrees with the slow one
+  is worse than no fast path at all.
+
+### Fixed
+
+- Row numbers reported by the pandas adapter closed up behind nulls: values were
+  filtered before being enumerated, so every reported row after the first null
+  pointed at the wrong record. Found by the fast-path equivalence tests, which
+  disagreed with each other. A Phase 3 test had encoded the wrong behaviour as
+  expected.
+- Value checks no longer accumulate every offending row in memory to display a
+  handful of samples. Counting without collecting keeps memory flat regardless
+  of how broken the data is — worst exactly when the dataset is largest.
+
+- Vectorised fast paths in the pandas adapter for range, allowed-value, pattern
+  and uniqueness checks. Validating 100,000 rows went from 154 ms to 13 ms — an
+  11× improvement, with the validation engine unchanged, which is what the
+  adapter protocol existed for. mlcontract is now faster than pandera on the
+  same workload.
+- Equivalence tests running identical data through the fast and slow paths and
+  asserting the reports match exactly. Two implementations of one check is the
+  arrangement most likely to drift.
+
 ### Changed
 
 - A pandas float column that contains nulls and holds only whole numbers is

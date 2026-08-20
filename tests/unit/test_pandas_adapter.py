@@ -159,8 +159,18 @@ class TestValues:
         assert type(value) is int
 
     def test_nulls_are_skipped_and_positions_preserved(self):
+        """Row numbers must survive a null, not close up behind it.
+
+        Enumerating after filtering shifts every row number following the first
+        null, so a report points at the wrong rows — in exactly the datasets
+        most likely to have problems. Regression test.
+        """
         frame = pd.DataFrame({"a": [1.0, None, 3.0]})
-        assert list(source(frame).iter_values("a")) == [(0, 1.0), (1, 3.0)]
+        assert list(source(frame).iter_values("a")) == [(0, 1.0), (2, 3.0)]
+
+    def test_row_numbers_survive_several_nulls(self):
+        frame = pd.DataFrame({"a": [None, None, 5.0, None, 7.0]})
+        assert list(source(frame).iter_values("a")) == [(2, 5.0), (4, 7.0)]
 
     def test_positions_are_positional_not_index_labels(self):
         """A frame with a non-default index must still report row positions."""
