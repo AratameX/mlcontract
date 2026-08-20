@@ -1,0 +1,66 @@
+name: Bug report
+description: Something behaves differently from what the docs say
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A reproducing case is worth more than a description. The smallest
+        contract and dataset that show the problem is ideal.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Include the error code (for example `MLC203`) if there is one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: The smallest contract and data that show it. Code is fine; a link to a repository is fine.
+      render: python
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: mlcontract version
+      description: "`mlcontract version`"
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Python version and OS
+      placeholder: "3.12.1, Windows 11"
+    validations:
+      required: true
+
+  - type: input
+    id: extras
+    attributes:
+      label: Which extras are installed
+      placeholder: "pandas, yaml"
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues
+          required: true
+        - label: I am on the latest release, or have said which version I am on
+          required: true

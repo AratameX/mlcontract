@@ -80,7 +80,7 @@ def run(suite: Suite) -> None:
                 partial(CONTRACT.validate, frame, sample_values=False),
                 iterations=5 if size >= 100_000 else 20,
                 rows=size,
-                notes="Value checks still iterate in Python; not yet vectorised.",
+                notes="Vectorised: value checks evaluate whole columns via the adapter.",
             )
         )
 

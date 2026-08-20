@@ -118,6 +118,22 @@ contract format carries its own `spec_version`.
   asserting the reports match exactly. Two implementations of one check is the
   arrangement most likely to drift.
 
+- Full README covering the problem, the differentiator, installation, contracts,
+  validation, the CLI, CI usage, performance, an honest comparison against
+  pandera and Great Expectations, versioning policy and support.
+- `SECURITY.md` with a private reporting channel and a real threat model —
+  contracts are untrusted input, regular expressions in them are not sandboxed,
+  and reports may carry sampled data.
+- `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, issue forms and a pull-request
+  template.
+- Dependabot for GitHub Actions and pip, with development tooling grouped so a
+  week of individual bumps is one pull request.
+- `pip-audit` in CI against the full dependency tree, failing the build on a
+  known vulnerability.
+- Tests keeping the community files honest: no surviving placeholders, README
+  links resolve, the security policy offers a private channel, and the declared
+  licence matches the package metadata.
+
 ### Changed
 
 - A pandas float column that contains nulls and holds only whole numbers is
