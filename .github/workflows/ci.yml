@@ -149,7 +149,19 @@ jobs:
         # Fails the build on a known vulnerability. If a finding has no fix
         # available yet, add `--ignore-vuln <ID>` here with a comment saying why,
         # rather than deleting the step.
-        run: pip-audit --strict --progress-spinner off
+        #
+        # Retried because pip-audit queries PyPI's API per package, and a single
+        # reset connection would otherwise fail the build for reasons unrelated
+        # to security. A check that goes red on network weather teaches people to
+        # re-run it without reading it.
+        run: |
+          for attempt in 1 2 3; do
+            pip-audit --strict --progress-spinner off && exit 0
+            echo "::warning::pip-audit attempt $attempt failed; retrying in 15s"
+            sleep 15
+          done
+          echo "::error::pip-audit failed after 3 attempts"
+          exit 1
 
   build:
     name: Build & verify distributions
