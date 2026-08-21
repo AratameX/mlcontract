@@ -10,7 +10,7 @@ a structured report, counts affected rows and collects examples.
 **Pandera**, when installed — the closest established alternative for dataframe
 validation.
 
-Where mlcontract loses, the results say so. A benchmark table where the author's
+Where schemapact loses, the results say so. A benchmark table where the author's
 library wins every row is not evidence; it is marketing, and readers discount it
 accordingly. The case for this library rests on contract versioning and
 breaking-change detection, which neither baseline does at all.
@@ -61,7 +61,7 @@ def run(suite: Suite) -> None:
 
     suite.record(
         measure(
-            "mlcontract, pandas adapter",
+            "schemapact, pandas adapter",
             group,
             lambda: CONTRACT.validate(frame, sample_values=False),
             iterations=5,

@@ -3,7 +3,7 @@
 Each constraint is described once, here, as data. Three separate parts of the
 library read this table:
 
-* :mod:`mlcontract.contract` — to reject constraints on types they cannot apply
+* :mod:`schemapact.contract` — to reject constraints on types they cannot apply
   to, such as a regex pattern on a float.
 * the validation engine — to know which check to run.
 * the diff engine — to know whether a change relaxed or tightened a rule, which
@@ -18,7 +18,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
-from mlcontract.dtypes import DType
+from schemapact.dtypes import DType
 
 
 class Direction(Enum):
@@ -46,7 +46,7 @@ class ConstraintSpec:
     """Metadata describing one constraint.
 
     Attributes:
-        name: The attribute on :class:`~mlcontract.contract.Feature`, which is
+        name: The attribute on :class:`~schemapact.contract.Feature`, which is
             also the key used in serialised contracts.
         applies_to: Types the constraint is meaningful for. Empty means all.
         direction: How the value moves when the rule is relaxed.

@@ -89,10 +89,10 @@ class Suite:
 
 def environment() -> dict[str, Any]:
     """Capture everything needed to interpret a number later."""
-    import mlcontract
+    import schemapact
 
     return {
-        "mlcontract": mlcontract.__version__,
+        "schemapact": schemapact.__version__,
         "python": platform.python_version(),
         "implementation": platform.python_implementation(),
         "system": platform.system(),

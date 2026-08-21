@@ -1,7 +1,7 @@
 {
   "recorded_at": "2026-08-20T14:25:31.452718+00:00",
   "environment": {
-    "mlcontract": "0.1.0.dev0",
+    "schemapact": "0.1.0.dev0",
     "python": "3.11.9",
     "implementation": "CPython",
     "system": "Windows",
@@ -269,7 +269,7 @@
       "notes": "Vectorised, but returns no codes, no row numbers and no examples."
     },
     {
-      "name": "mlcontract, pandas adapter",
+      "name": "schemapact, pandas adapter",
       "group": "comparison",
       "iterations": 5,
       "median_ms": 7.9093,

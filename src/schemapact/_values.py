@@ -11,7 +11,7 @@ than each deciding for itself.
 
 Note the division of labour: this module helps adapters *produce* well-formed
 values. Deciding whether a column's type satisfies a contract is the engine's
-job, via :meth:`~mlcontract.dtypes.DType.accepts`. Keeping those separate means
+job, via :meth:`~schemapact.dtypes.DType.accepts`. Keeping those separate means
 type conformance has one implementation, not one per adapter.
 """
 
@@ -22,7 +22,7 @@ import math
 from collections.abc import Iterable
 from typing import Any
 
-from mlcontract.dtypes import DType
+from schemapact.dtypes import DType
 
 _TRUE = frozenset({"true", "t", "yes", "y", "1"})
 _FALSE = frozenset({"false", "f", "no", "n", "0"})

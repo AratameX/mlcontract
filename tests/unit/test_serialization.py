@@ -11,7 +11,7 @@ import json
 
 import pytest
 
-from mlcontract import SPEC_VERSION, Contract, ContractDefinitionError, DType, Feature
+from schemapact import SPEC_VERSION, Contract, ContractDefinitionError, DType, Feature
 from tests._support import requires_yaml
 
 
@@ -89,7 +89,7 @@ class TestJson:
     def test_malformed_json_reports_position(self):
         with pytest.raises(ContractDefinitionError) as exc:
             Contract.from_json("{not json")
-        assert exc.value.code.code == "MLC010"
+        assert exc.value.code.code == "SPX010"
         assert "line" in str(exc.value)
 
 
@@ -109,7 +109,7 @@ class TestYaml:
     def test_malformed_yaml(self):
         with pytest.raises(ContractDefinitionError) as exc:
             Contract.from_yaml("features:\n  - [unclosed")
-        assert exc.value.code.code == "MLC010"
+        assert exc.value.code.code == "SPX010"
 
 
 @requires_yaml
@@ -178,7 +178,7 @@ class TestFiles:
     def test_unknown_extension_on_save(self, tmp_path):
         with pytest.raises(ContractDefinitionError) as exc:
             rich_contract().save(tmp_path / "contract.txt")
-        assert exc.value.code.code == "MLC010"
+        assert exc.value.code.code == "SPX010"
 
     @requires_yaml
     def test_unknown_extension_on_load(self, tmp_path):
@@ -191,7 +191,7 @@ class TestFiles:
     def test_missing_file(self, tmp_path):
         with pytest.raises(ContractDefinitionError) as exc:
             Contract.load(tmp_path / "absent.yaml")
-        assert exc.value.code.code == "MLC010"
+        assert exc.value.code.code == "SPX010"
 
 
 class TestParsingErrors:
@@ -200,7 +200,7 @@ class TestParsingErrors:
             Contract.from_dict(
                 {"name": "x", "version": "1.0.0", "features": {}, "versoin": "1.0.0"}
             )
-        assert exc.value.code.code == "MLC002"
+        assert exc.value.code.code == "SPX002"
         assert "Did you mean 'version'?" in str(exc.value)
 
     def test_unknown_feature_key_is_not_silently_dropped(self):
@@ -213,7 +213,7 @@ class TestParsingErrors:
                     "features": {"age": {"type": "integer", "nullabe": False}},
                 }
             )
-        assert exc.value.code.code == "MLC002"
+        assert exc.value.code.code == "SPX002"
         assert "nullable" in str(exc.value)
 
     @pytest.mark.parametrize("key", ["name", "version", "features"])
@@ -222,28 +222,28 @@ class TestParsingErrors:
         del document[key]
         with pytest.raises(ContractDefinitionError) as exc:
             Contract.from_dict(document)
-        assert exc.value.code.code == "MLC011"
+        assert exc.value.code.code == "SPX011"
 
     def test_feature_without_a_type(self):
         with pytest.raises(ContractDefinitionError) as exc:
             Contract.from_dict({"name": "x", "version": "1.0.0", "features": {"a": {}}})
-        assert exc.value.code.code == "MLC011"
+        assert exc.value.code.code == "SPX011"
 
     @pytest.mark.parametrize("document", ["a string", 42, ["a", "list"], None])
     def test_non_mapping_documents(self, document):
         with pytest.raises(ContractDefinitionError) as exc:
             Contract.from_dict(document)
-        assert exc.value.code.code == "MLC010"
+        assert exc.value.code.code == "SPX010"
 
     def test_non_mapping_features_section(self):
         with pytest.raises(ContractDefinitionError) as exc:
             Contract.from_dict({"name": "x", "version": "1.0.0", "features": ["age"]})
-        assert exc.value.code.code == "MLC010"
+        assert exc.value.code.code == "SPX010"
 
     def test_non_mapping_feature_body(self):
         with pytest.raises(ContractDefinitionError) as exc:
             Contract.from_dict({"name": "x", "version": "1.0.0", "features": {"age": "integer"}})
-        assert exc.value.code.code == "MLC010"
+        assert exc.value.code.code == "SPX010"
 
     def test_json_document_that_is_not_an_object(self):
         with pytest.raises(ContractDefinitionError):
@@ -259,19 +259,19 @@ class TestParsingErrors:
                     "features": {"a": {"type": "integer"}},
                 }
             )
-        assert exc.value.code.code == "MLC003"
+        assert exc.value.code.code == "SPX003"
 
 
 class TestFormatSniffing:
     """Decoding without a filename, used when a document arrives as text."""
 
     def test_json_is_detected_by_its_opening_brace(self):
-        from mlcontract.serialization import decode_text
+        from schemapact.serialization import decode_text
 
         assert decode_text('{"name": "x"}') == {"name": "x"}
 
     @requires_yaml
     def test_anything_else_is_treated_as_yaml(self):
-        from mlcontract.serialization import decode_text
+        from schemapact.serialization import decode_text
 
         assert decode_text("name: x") == {"name": "x"}

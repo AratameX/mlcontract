@@ -6,7 +6,7 @@ instead of a production incident.
 
 Equivalent as a shell step:
 
-    mlcontract check-compatibility contracts/v1.yaml contracts/v2.yaml --mode backward
+    schemapact check-compatibility contracts/v1.yaml contracts/v2.yaml --mode backward
 
 Run it:
 
@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import sys
 
-from mlcontract import Compatibility, Contract, DType, Feature
+from schemapact import Compatibility, Contract, DType, Feature
 
 PRODUCTION = Contract(
     name="model_input",

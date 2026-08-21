@@ -1,4 +1,4 @@
-"""The ``mlcontract`` command-line interface.
+"""The ``schemapact`` command-line interface.
 
 The point of this CLI is to fail a build. Everything else it prints is
 secondary, which is why the exit codes are treated as part of the public
@@ -32,13 +32,13 @@ from enum import IntEnum
 from pathlib import Path
 from typing import Any
 
-from mlcontract._version import __version__
-from mlcontract.compatibility import Compatibility
-from mlcontract.contract import Contract
-from mlcontract.exceptions import (
+from schemapact._version import __version__
+from schemapact.compatibility import Compatibility
+from schemapact.contract import Contract
+from schemapact.exceptions import (
     ContractDefinitionError,
     ContractValidationError,
-    MLContractError,
+    SchemaPactError,
 )
 
 
@@ -93,7 +93,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         # problem with the invocation rather than with the data's contents.
         _fail(str(error))
         return ExitCode.USAGE_ERROR
-    except MLContractError as error:
+    except SchemaPactError as error:
         _fail(str(error))
         return ExitCode.USAGE_ERROR
     except OSError as error:
@@ -169,7 +169,7 @@ def _check_compatibility(args: argparse.Namespace) -> int:
 
 def _init(args: argparse.Namespace) -> int:
     """Write a starting contract, optionally inferred from existing data."""
-    from mlcontract import _inference
+    from schemapact import _inference
 
     if args.from_csv and not Path(args.from_csv).exists():
         raise UsageError(f"No such data file: {args.from_csv}")
@@ -202,7 +202,7 @@ def _init(args: argparse.Namespace) -> int:
 
 def _version(_: argparse.Namespace) -> int:
     """Print the installed version."""
-    _emit(f"mlcontract {__version__}")
+    _emit(f"schemapact {__version__}")
     return ExitCode.SUCCESS
 
 
@@ -218,14 +218,14 @@ def build_parser() -> argparse.ArgumentParser:
     running anything.
     """
     parser = argparse.ArgumentParser(
-        prog="mlcontract",
-        description="Executable contracts for ML systems.",
+        prog="schemapact",
+        description="Versioned data contracts. Validate data and catch breaking schema changes.",
         epilog=(
             "Exit codes: 0 success, 1 data violated the contract, "
             "2 incompatible change, 3 usage error, 4 invalid contract."
         ),
     )
-    parser.add_argument("--version", action="version", version=f"mlcontract {__version__}")
+    parser.add_argument("--version", action="version", version=f"schemapact {__version__}")
 
     commands = parser.add_subparsers(dest="command", metavar="COMMAND")
 
@@ -355,8 +355,8 @@ def _fail(message: str) -> None:
 
 def _example_contract(name: str, version: str) -> Any:
     """Build a small illustrative contract for ``init`` with no data file."""
-    from mlcontract.contract import Feature
-    from mlcontract.dtypes import DType
+    from schemapact.contract import Feature
+    from schemapact.dtypes import DType
 
     return Contract(
         name=name,

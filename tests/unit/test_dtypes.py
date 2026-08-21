@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from mlcontract import DType
-from mlcontract.exceptions import ContractDefinitionError
+from schemapact import DType
+from schemapact.exceptions import ContractDefinitionError
 
 
 class TestParsing:
@@ -36,7 +36,7 @@ class TestParsing:
     def test_unknown_name_lists_alternatives(self):
         with pytest.raises(ContractDefinitionError) as exc:
             DType.parse("complex128")
-        assert exc.value.code.code == "MLC006"
+        assert exc.value.code.code == "SPX006"
         assert "integer" in str(exc.value)
 
     def test_object_is_not_an_alias(self):
@@ -47,7 +47,7 @@ class TestParsing:
     def test_non_string_rejected(self):
         with pytest.raises(ContractDefinitionError) as exc:
             DType.parse(42)  # type: ignore[arg-type]
-        assert exc.value.code.code == "MLC006"
+        assert exc.value.code.code == "SPX006"
 
 
 class TestProperties:
@@ -114,27 +114,27 @@ class TestLiteralTypeMatching:
     """Value/type compatibility, exercised through allowed_values."""
 
     def test_boolean_values(self):
-        from mlcontract import Feature
+        from schemapact import Feature
 
         assert Feature("flag", DType.BOOLEAN, allowed_values=[True, False]).allowed_values
 
     def test_float_rejects_allowed_values(self):
         """Exact-float enumeration invites equality bugs, so floats reject it."""
-        from mlcontract import Feature
-        from mlcontract.exceptions import ContractDefinitionError
+        from schemapact import Feature
+        from schemapact.exceptions import ContractDefinitionError
 
         with pytest.raises(ContractDefinitionError) as exc:
             Feature("ratio", DType.FLOAT, allowed_values=[0.5])
-        assert exc.value.code.code == "MLC008"
+        assert exc.value.code.code == "SPX008"
 
     def test_boolean_rejects_integers(self):
-        from mlcontract import Feature
-        from mlcontract.exceptions import ContractDefinitionError
+        from schemapact import Feature
+        from schemapact.exceptions import ContractDefinitionError
 
         with pytest.raises(ContractDefinitionError):
             Feature("flag", DType.BOOLEAN, allowed_values=[1])
 
     def test_date_values_are_strings(self):
-        from mlcontract import Feature
+        from schemapact import Feature
 
         assert Feature("day", DType.DATE, allowed_values=["2026-01-01"]).allowed_values

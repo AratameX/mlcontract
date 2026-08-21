@@ -23,9 +23,9 @@ contract format carries its own `spec_version`.
 - `ValidationReport`, `Violation`, `Sample` and `Severity`. Reports carry error
   codes, affected row counts, sampled offending values with row positions, and
   remediation text, and render as text or JSON.
-- Structural checks (`MLC101`-`MLC106`): missing required columns, undeclared
+- Structural checks (`SPX101`-`SPX106`): missing required columns, undeclared
   columns, column order, column types, row-count bounds.
-- Value checks (`MLC201`-`MLC208`): nullability, null fraction, ranges, allowed
+- Value checks (`SPX201`-`SPX208`): nullability, null fraction, ranges, allowed
   values, patterns, uniqueness.
 - Validation exception family, raised only via `raise_for_status()`.
 - `sample_values=False` for reports written where raw data should not go.
@@ -49,15 +49,15 @@ contract format carries its own `spec_version`.
   as a patch release — the check worth putting in CI.
 - Declared renames via `previous_names` are reported once as a rename rather
   than as an unrelated removal and addition. Renames are never inferred.
-- Compatibility error codes `MLC601` and `MLC602`, and `CompatibilityError`.
+- Compatibility error codes `SPX601` and `SPX602`, and `CompatibilityError`.
 
-- Command-line interface: `mlcontract validate`, `diff`, `check-compatibility`,
+- Command-line interface: `schemapact validate`, `diff`, `check-compatibility`,
   `init` and `version`, with `--format text|json` throughout.
 - Documented exit codes, treated as part of the public interface: 0 success,
   1 data violated the contract, 2 incompatible change, 3 usage error, 4 invalid
   contract. 1 and 2 are deliberately distinct — "this dataset is bad" and "this
   schema change breaks your consumers" call for different pipeline responses.
-- `mlcontract init --from-csv` infers a starting contract from existing data.
+- `schemapact init --from-csv` infers a starting contract from existing data.
   Types generalise, so they are inferred; observed minima and maxima do not, so
   ranges are opt-in behind `--infer-ranges`.
 - `--no-samples` on validate, for reports written where raw values should not go.
@@ -92,7 +92,7 @@ contract format carries its own `spec_version`.
   path existing.
 - The pandas adapter implements all five, making validation **12× faster and 6×
   lighter** — 154 ms to 12.8 ms on 100,000 rows, and 3.1 MB to 0.5 MB — with no
-  change to the engine and no change to what any report says. mlcontract now
+  change to the engine and no change to what any report says. schemapact now
   measures faster than pandera on the same benchmark.
 - Equivalence tests running identical data through both paths and comparing
   entire reports, because a fast path that quietly disagrees with the slow one
@@ -112,7 +112,7 @@ contract format carries its own `spec_version`.
 - Vectorised fast paths in the pandas adapter for range, allowed-value, pattern
   and uniqueness checks. Validating 100,000 rows went from 154 ms to 13 ms — an
   11× improvement, with the validation engine unchanged, which is what the
-  adapter protocol existed for. mlcontract is now faster than pandera on the
+  adapter protocol existed for. schemapact is now faster than pandera on the
   same workload.
 - Equivalence tests running identical data through the fast and slow paths and
   asserting the reports match exactly. Two implementations of one check is the
@@ -162,9 +162,9 @@ contract format carries its own `spec_version`.
   without this the mark became part of the first column's name, producing a
   header like `"\ufeffid"` that silently matched nothing. Found by running the
   CLI by hand on Windows; no Linux test could have caught it.
-- `mlcontract.cli.__init__` no longer re-exports the `main` function. Binding it
+- `schemapact.cli.__init__` no longer re-exports the `main` function. Binding it
   there shadowed the `main` submodule of the same name, so even
-  `import mlcontract.cli.main` returned the function.
+  `import schemapact.cli.main` returned the function.
 - `ValidationReport` deliberately defines no `__bool__`. It would have to mean
   either "is valid" or "has violations" — opposites — while `__len__` already
   implies the second. Callers say `report.is_valid`.
@@ -174,7 +174,7 @@ contract format carries its own `spec_version`.
   license, dependency-free core.
 - Tooling baseline: ruff (lint + format), mypy in strict mode, pytest with
   branch coverage gated at 90%.
-- Public API snapshot test guarding `mlcontract.__all__` against accidental
+- Public API snapshot test guarding `schemapact.__all__` against accidental
   removals.
 - Continuous integration running lint, type checks, tests, package build and a
   clean-environment import smoke test.
@@ -199,9 +199,9 @@ contract format carries its own `spec_version`.
   representation, so both formats produce identical objects.
 - `spec_version` on every contract, separate from the author's own `version`,
   so the file format can evolve without invalidating stored contracts.
-- Exception hierarchy (`MLContractError`, `ContractDefinitionError`,
-  `IntegrationError`) and a permanent error-code registry, `MLC001`–`MLC014`
-  and `MLC901`.
+- Exception hierarchy (`SchemaPactError`, `ContractDefinitionError`,
+  `IntegrationError`) and a permanent error-code registry, `SPX001`–`SPX014`
+  and `SPX901`.
 - Unknown keys in contract documents are rejected with a suggested correction
   rather than silently ignored.
 - Declared feature renames via `previous_names`. Renames are never inferred.
@@ -228,4 +228,4 @@ contract format carries its own `spec_version`.
   `SPEC_VERSION`, and the three exception types.
 - Contract format: `spec_version` 1, introduced here.
 
-[Unreleased]: https://github.com/AratameX/mlcontract/commits/main
+[Unreleased]: https://github.com/AratameX/schemapact/commits/main

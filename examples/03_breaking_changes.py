@@ -10,7 +10,7 @@ Run it:
 
 from __future__ import annotations
 
-from mlcontract import Compatibility, Contract, DType, Feature
+from schemapact import Compatibility, Contract, DType, Feature
 
 V1 = Contract(
     name="customer_features",

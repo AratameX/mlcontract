@@ -78,6 +78,6 @@ def test_the_readme_states_the_licence_matching_the_metadata():
     import importlib.metadata as metadata
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    declared = metadata.metadata("mlcontract")["License-Expression"]
+    declared = metadata.metadata("schemapact")["License-Expression"]
     assert declared == "Apache-2.0"
     assert "Apache-2.0" in readme

@@ -2,7 +2,7 @@
 
 :func:`resolve` is the only place in the library that inspects the *kind* of
 data it has been given. Everything downstream sees a
-:class:`~mlcontract._protocols.DataSource` and nothing else.
+:class:`~schemapact._protocols.DataSource` and nothing else.
 
 Detection is by duck typing rather than ``isinstance`` against imported classes,
 because importing pandas here to check for a DataFrame would drag the dependency
@@ -16,12 +16,12 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from mlcontract.adapters.mapping import CsvSource, MappingSource
-from mlcontract.exceptions import MLC902, ContractValidationError
+from schemapact.adapters.mapping import CsvSource, MappingSource
+from schemapact.exceptions import SPX902, ContractValidationError
 
 if TYPE_CHECKING:
-    from mlcontract._protocols import DataSource
-    from mlcontract.contract import Contract
+    from schemapact._protocols import DataSource
+    from schemapact.contract import Contract
 
 CSV_SUFFIXES = frozenset({".csv", ".tsv"})
 """File extensions handled by the built-in CSV adapter."""
@@ -53,7 +53,7 @@ def resolve(data: Any, contract: Contract) -> DataSource:
         # Imported here, never at module scope, so the core install never pulls
         # pandas in. The extra's absence surfaces as install guidance rather
         # than an ImportError from somewhere unrelated.
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters.pandas import PandasSource
 
         return PandasSource(data)
 
@@ -63,14 +63,14 @@ def resolve(data: Any, contract: Contract) -> DataSource:
         raise ContractValidationError(
             "A sequence was passed, but not every item is a mapping. Rows must be "
             "dict-like, for example [{'age': 30}, {'age': 41}].",
-            code=MLC902,
+            code=SPX902,
         )
 
     raise ContractValidationError(
         f"Cannot validate an object of type {type(data).__name__!r}. Supported inputs are "
         "a list of mappings, a path to a .csv or .tsv file, or a pandas DataFrame with "
         'the "pandas" extra installed.',
-        code=MLC902,
+        code=SPX902,
         received=type(data).__name__,
     )
 
@@ -78,7 +78,7 @@ def resolve(data: Any, contract: Contract) -> DataSource:
 def _resolve_path(path: Path, contract: Contract) -> DataSource:
     """Build a source from a file path, choosing by extension."""
     if not path.exists():
-        raise ContractValidationError(f"No such data file: {path}", code=MLC902, path=str(path))
+        raise ContractValidationError(f"No such data file: {path}", code=SPX902, path=str(path))
 
     suffix = path.suffix.lower()
     if suffix not in CSV_SUFFIXES:
@@ -86,7 +86,7 @@ def _resolve_path(path: Path, contract: Contract) -> DataSource:
         raise ContractValidationError(
             f"Cannot read {path.name}: unsupported extension {suffix!r}. "
             f"Supported data files: {supported}.",
-            code=MLC902,
+            code=SPX902,
             path=str(path),
         )
 

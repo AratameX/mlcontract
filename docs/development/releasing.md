@@ -18,9 +18,9 @@ The project does not exist on PyPI yet, so register a **pending publisher**:
 
 | Field | Value |
 | --- | --- |
-| PyPI Project Name | `mlcontract` |
+| PyPI Project Name | `schemapact` |
 | Owner | `AratameX` |
-| Repository name | `mlcontract` |
+| Repository name | `schemapact` |
 | Workflow name | `publish.yml` |
 | Environment name | `pypi` |
 
@@ -51,7 +51,7 @@ git checkout main && git pull
 git checkout -b release-0.1.0
 ```
 
-- Set the version in `src/mlcontract/_version.py`. It is the only place it
+- Set the version in `src/schemapact/_version.py`. It is the only place it
   appears; `pyproject.toml` reads it from there.
 - Move `CHANGELOG.md`'s `[Unreleased]` entries under `## [0.1.0] - YYYY-MM-DD`,
   and state whether the **Python API** and the **contract format** remain
@@ -98,8 +98,8 @@ and runs, and creates the GitHub release with notes taken from the changelog.
 ### 7. After
 
 ```bash
-pip install mlcontract          # from a machine that has never seen the source
-mlcontract version
+pip install schemapact          # from a machine that has never seen the source
+schemapact version
 ```
 
 Open a pull request setting `_version.py` to the next `.dev0` and adding a fresh

@@ -73,11 +73,11 @@ Same checks, same data, same machine, 100,000 rows:
 | Approach | Median | Peak memory | Relative |
 | --- | ---: | ---: | ---: |
 | Hand-written pandas assertions | 1.6 ms | 0.5 MB | 1× |
-| **mlcontract, pandas adapter** | **7.9 ms** | **0.5 MB** | **4.9× slower** |
+| **schemapact, pandas adapter** | **7.9 ms** | **0.5 MB** | **4.9× slower** |
 | pandera, lazy validation | 10.3 ms | 3.6 MB | 6.4× slower |
 
 Hand-written assertions remain the fastest, and always will be: they do nothing
-except compute booleans. mlcontract costs about four times as much and returns
+except compute booleans. schemapact costs about four times as much and returns
 structured violations with error codes, affected-row counts, sampled offending
 values and remediation text — which is the trade being made, and it is worth
 knowing you are making it.

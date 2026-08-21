@@ -14,7 +14,7 @@ that previously passed.
 Forward compatibility needs no second table. "Can the old contract read data
 written for the new one?" is the same question with the arguments swapped, so it
 is computed by diffing in reverse. One implementation, no possibility of the two
-directions drifting apart. See :mod:`mlcontract.compatibility`.
+directions drifting apart. See :mod:`schemapact.compatibility`.
 """
 
 from __future__ import annotations
@@ -24,8 +24,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from mlcontract.constraints import CONSTRAINTS, Direction
-from mlcontract.contract import Contract, Feature
+from schemapact.constraints import CONSTRAINTS, Direction
+from schemapact.contract import Contract, Feature
 
 
 class ChangeKind(Enum):
@@ -177,7 +177,7 @@ class ContractDiff:
 
         This is the *backward* question specifically. For forward or full
         compatibility use
-        :meth:`~mlcontract.contract.Contract.is_compatible_with`, which handles
+        :meth:`~schemapact.contract.Contract.is_compatible_with`, which handles
         direction explicitly.
         """
         return bool(self.breaking_changes)

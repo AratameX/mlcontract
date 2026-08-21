@@ -30,9 +30,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from mlcontract.contract import Contract
-from mlcontract.diff import Change, compare
-from mlcontract.exceptions import MLC601, CompatibilityError
+from schemapact.contract import Contract
+from schemapact.diff import Change, compare
+from schemapact.exceptions import SPX601, CompatibilityError
 
 
 class Compatibility(Enum):
@@ -123,7 +123,7 @@ class CompatibilityResult:
             f"{self.new.name} {self.old.version} -> {self.new.version} is not "
             f"{self.mode} compatible: {len(self.breaking_changes)} breaking change(s).\n"
             + self.summary(),
-            code=MLC601,
+            code=SPX601,
             result=self,
             mode=self.mode.value,
         )
@@ -164,7 +164,7 @@ def check(
         The outcome, including which changes broke it and in which direction.
 
     Example:
-        >>> from mlcontract import DType, Feature
+        >>> from schemapact import DType, Feature
         >>> old = Contract(
         ...     name="c", version="1.0.0",
         ...     features=[Feature("age", DType.INTEGER)],

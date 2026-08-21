@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from mlcontract.exceptions import MLC006, ContractDefinitionError
+from schemapact.exceptions import SPX006, ContractDefinitionError
 
 
 class DType(Enum):
@@ -71,7 +71,7 @@ class DType(Enum):
     def widens_to(self, other: DType) -> bool:
         """Return True if every value of this type is also valid as ``other``.
 
-        Widening is the basis of backward compatibility in :mod:`mlcontract.diff`:
+        Widening is the basis of backward compatibility in :mod:`schemapact.diff`:
         a type change that widens accepts all previously valid data and is
         therefore not breaking, while any other change is.
 
@@ -142,7 +142,7 @@ class DType(Enum):
         if not isinstance(value, str):
             raise ContractDefinitionError(
                 f"Data type must be a string or DType, got {type(value).__name__}.",
-                code=MLC006,
+                code=SPX006,
                 value=value,
             )
 
@@ -151,7 +151,7 @@ class DType(Enum):
             accepted = ", ".join(sorted(_ALIASES))
             raise ContractDefinitionError(
                 f"Unknown data type {value!r}. Accepted names: {accepted}.",
-                code=MLC006,
+                code=SPX006,
                 value=value,
             )
         return resolved

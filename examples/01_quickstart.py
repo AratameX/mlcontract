@@ -7,7 +7,7 @@ Run it:
 
 from __future__ import annotations
 
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 
 
 def main() -> None:

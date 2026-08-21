@@ -1,7 +1,7 @@
 # Architecture
 
 ```
-mlcontract/
+schemapact/
 ├── contract.py        Contract, Feature — the domain model
 ├── dtypes.py          the canonical type system and widening relation
 ├── constraints.py     the constraint catalogue, as data

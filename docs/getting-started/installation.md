@@ -1,7 +1,7 @@
 # Installation
 
 ```bash
-pip install mlcontract
+pip install schemapact
 ```
 
 That is the whole core. It has **no required dependencies** — contracts are
@@ -14,18 +14,18 @@ Install these only if you need them.
 
 | Extra | Command | Adds |
 | --- | --- | --- |
-| YAML | `pip install "mlcontract[yaml]"` | Reading and writing YAML contracts |
-| pandas | `pip install "mlcontract[pandas]"` | Validating DataFrames |
-| Both | `pip install "mlcontract[all]"` | |
+| YAML | `pip install "schemapact[yaml]"` | Reading and writing YAML contracts |
+| pandas | `pip install "schemapact[pandas]"` | Validating DataFrames |
+| Both | `pip install "schemapact[all]"` | |
 
 Using a feature whose extra is missing produces an error naming the exact
 command to run, rather than an `ImportError` from somewhere unrelated:
 
 ```
-IntegrationError [MLC901]: Reading and writing YAML contracts requires the
+IntegrationError [SPX901]: Reading and writing YAML contracts requires the
 optional 'yaml' extra, which provides 'PyYAML'. Install it with:
 
-    pip install "mlcontract[yaml]"
+    pip install "schemapact[yaml]"
 ```
 
 ## Requirements
@@ -36,14 +36,14 @@ Windows.
 ## Verify
 
 ```bash
-mlcontract version
+schemapact version
 ```
 
 ## Development install
 
 ```bash
-git clone https://github.com/AratameX/mlcontract
-cd mlcontract
+git clone https://github.com/AratameX/schemapact
+cd schemapact
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pre-commit install

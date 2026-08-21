@@ -3,9 +3,9 @@ requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mlcontract"
+name = "schemapact"
 dynamic = ["version"]
-description = "Executable contracts for ML systems — validate data, models and predictions before they break production."
+description = "Versioned data contracts that catch breaking schema changes before they reach production."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
@@ -48,7 +48,7 @@ dependencies = []
 [project.optional-dependencies]
 yaml = ["PyYAML>=6.0"]
 pandas = ["pandas>=1.5"]
-all = ["mlcontract[yaml,pandas]"]
+all = ["schemapact[yaml,pandas]"]
 
 test = ["pytest>=8.0", "pytest-cov>=5.0", "hypothesis>=6.100"]
 lint = ["ruff>=0.6", "mypy>=1.11"]
@@ -60,29 +60,29 @@ docs = [
     "mkdocs-material>=9.5",
     "mkdocstrings[python]>=0.25",
 ]
-dev = ["mlcontract[all,test,lint,docs]", "build>=1.2", "twine>=5.1", "pre-commit>=3.7"]
+dev = ["schemapact[all,test,lint,docs]", "build>=1.2", "twine>=5.1", "pre-commit>=3.7"]
 
 [project.scripts]
-mlcontract = "mlcontract.cli.main:run"
+schemapact = "schemapact.cli.main:run"
 
 [project.urls]
-Homepage = "https://github.com/AratameX/mlcontract"
-Repository = "https://github.com/AratameX/mlcontract"
-Documentation = "https://github.com/AratameX/mlcontract#readme"
-Changelog = "https://github.com/AratameX/mlcontract/blob/main/CHANGELOG.md"
-Issues = "https://github.com/AratameX/mlcontract/issues"
+Homepage = "https://github.com/AratameX/schemapact"
+Repository = "https://github.com/AratameX/schemapact"
+Documentation = "https://github.com/AratameX/schemapact#readme"
+Changelog = "https://github.com/AratameX/schemapact/blob/main/CHANGELOG.md"
+Issues = "https://github.com/AratameX/schemapact/issues"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
 
 [tool.setuptools.dynamic]
-version = { attr = "mlcontract._version.__version__" }
+version = { attr = "schemapact._version.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-mlcontract = ["py.typed"]
+schemapact = ["py.typed"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
@@ -164,7 +164,7 @@ convention = "google"
 
 [tool.coverage.run]
 branch = true
-source = ["mlcontract"]
+source = ["schemapact"]
 parallel = true
 
 [tool.coverage.report]

@@ -12,14 +12,14 @@ from:
 ===========  =====================================================
 Range        Domain
 ===========  =====================================================
-``MLC0xx``   Contract definition — the contract itself is invalid
-``MLC1xx``   Structural validation — columns, order, dtypes
-``MLC2xx``   Value constraints — nulls, ranges, categories, patterns
-``MLC3xx``   Model metadata
-``MLC4xx``   Predictions and outputs
-``MLC5xx``   Metrics
-``MLC6xx``   Compatibility and breaking changes
-``MLC9xx``   Integrations and optional dependencies
+``SPX0xx``   Contract definition — the contract itself is invalid
+``SPX1xx``   Structural validation — columns, order, dtypes
+``SPX2xx``   Value constraints — nulls, ranges, categories, patterns
+``SPX3xx``   Model metadata
+``SPX4xx``   Predictions and outputs
+``SPX5xx``   Metrics
+``SPX6xx``   Compatibility and breaking changes
+``SPX9xx``   Integrations and optional dependencies
 ===========  =====================================================
 
 Only codes that are actually raised somewhere are registered. The registry grows
@@ -37,7 +37,7 @@ class ErrorCode:
     """A permanent, machine-readable identifier for one failure mode.
 
     Attributes:
-        code: The stable identifier, for example ``"MLC004"``.
+        code: The stable identifier, for example ``"SPX004"``.
         summary: A short description of what the code means. Safe to reword for
             clarity; the code itself is what callers depend on.
     """
@@ -51,127 +51,127 @@ class ErrorCode:
 
 
 # --------------------------------------------------------------------------
-# MLC0xx — contract definition
+# SPX0xx — contract definition
 # --------------------------------------------------------------------------
 
-MLC001 = ErrorCode("MLC001", "Contract or feature name is missing or invalid")
-MLC002 = ErrorCode("MLC002", "Unrecognised key in a contract document")
-MLC003 = ErrorCode("MLC003", "Contract format version is not supported by this release")
-MLC004 = ErrorCode("MLC004", "Contract version is not a valid semantic version")
-MLC005 = ErrorCode("MLC005", "Duplicate feature name")
-MLC006 = ErrorCode("MLC006", "Unknown data type")
-MLC007 = ErrorCode("MLC007", "Constraint value is invalid")
-MLC008 = ErrorCode("MLC008", "Constraint does not apply to this data type")
-MLC009 = ErrorCode("MLC009", "Constraints contradict one another")
-MLC010 = ErrorCode("MLC010", "Contract document is malformed")
-MLC011 = ErrorCode("MLC011", "Required key is missing from a contract document")
-MLC012 = ErrorCode("MLC012", "Contract declares no features")
-MLC013 = ErrorCode("MLC013", "Declared previous name collides with a current feature name")
-MLC014 = ErrorCode("MLC014", "Row-count bounds are invalid")
+SPX001 = ErrorCode("SPX001", "Contract or feature name is missing or invalid")
+SPX002 = ErrorCode("SPX002", "Unrecognised key in a contract document")
+SPX003 = ErrorCode("SPX003", "Contract format version is not supported by this release")
+SPX004 = ErrorCode("SPX004", "Contract version is not a valid semantic version")
+SPX005 = ErrorCode("SPX005", "Duplicate feature name")
+SPX006 = ErrorCode("SPX006", "Unknown data type")
+SPX007 = ErrorCode("SPX007", "Constraint value is invalid")
+SPX008 = ErrorCode("SPX008", "Constraint does not apply to this data type")
+SPX009 = ErrorCode("SPX009", "Constraints contradict one another")
+SPX010 = ErrorCode("SPX010", "Contract document is malformed")
+SPX011 = ErrorCode("SPX011", "Required key is missing from a contract document")
+SPX012 = ErrorCode("SPX012", "Contract declares no features")
+SPX013 = ErrorCode("SPX013", "Declared previous name collides with a current feature name")
+SPX014 = ErrorCode("SPX014", "Row-count bounds are invalid")
 
 # --------------------------------------------------------------------------
-# MLC1xx — structural validation
+# SPX1xx — structural validation
 # --------------------------------------------------------------------------
 
-MLC101 = ErrorCode("MLC101", "A required feature is missing from the data")
-MLC102 = ErrorCode("MLC102", "The data contains a column the contract does not declare")
-MLC103 = ErrorCode("MLC103", "Columns are not in the order the contract declares")
-MLC104 = ErrorCode("MLC104", "A column's type does not satisfy the declared type")
-MLC105 = ErrorCode("MLC105", "The dataset has fewer rows than the contract permits")
-MLC106 = ErrorCode("MLC106", "The dataset has more rows than the contract permits")
+SPX101 = ErrorCode("SPX101", "A required feature is missing from the data")
+SPX102 = ErrorCode("SPX102", "The data contains a column the contract does not declare")
+SPX103 = ErrorCode("SPX103", "Columns are not in the order the contract declares")
+SPX104 = ErrorCode("SPX104", "A column's type does not satisfy the declared type")
+SPX105 = ErrorCode("SPX105", "The dataset has fewer rows than the contract permits")
+SPX106 = ErrorCode("SPX106", "The dataset has more rows than the contract permits")
 
 # --------------------------------------------------------------------------
-# MLC2xx — value constraints
+# SPX2xx — value constraints
 # --------------------------------------------------------------------------
 
-MLC201 = ErrorCode("MLC201", "Null values found in a column declared not nullable")
-MLC202 = ErrorCode("MLC202", "The proportion of nulls exceeds the permitted maximum")
-MLC203 = ErrorCode("MLC203", "Values fall below the declared minimum")
-MLC204 = ErrorCode("MLC204", "Values exceed the declared maximum")
-MLC205 = ErrorCode("MLC205", "Values fall outside the declared set of allowed values")
-MLC206 = ErrorCode("MLC206", "Values do not match the declared pattern")
-MLC207 = ErrorCode("MLC207", "Duplicate values found in a column declared unique")
+SPX201 = ErrorCode("SPX201", "Null values found in a column declared not nullable")
+SPX202 = ErrorCode("SPX202", "The proportion of nulls exceeds the permitted maximum")
+SPX203 = ErrorCode("SPX203", "Values fall below the declared minimum")
+SPX204 = ErrorCode("SPX204", "Values exceed the declared maximum")
+SPX205 = ErrorCode("SPX205", "Values fall outside the declared set of allowed values")
+SPX206 = ErrorCode("SPX206", "Values do not match the declared pattern")
+SPX207 = ErrorCode("SPX207", "Duplicate values found in a column declared unique")
 
 # --------------------------------------------------------------------------
-# MLC1xx — structural validation
+# SPX1xx — structural validation
 # --------------------------------------------------------------------------
 
-MLC101 = ErrorCode("MLC101", "A required feature is missing from the data")
-MLC102 = ErrorCode("MLC102", "The data contains a column the contract does not declare")
-MLC103 = ErrorCode("MLC103", "Columns are not in the order the contract declares")
-MLC104 = ErrorCode("MLC104", "A column's type does not match the contract")
-MLC105 = ErrorCode("MLC105", "The dataset has fewer rows than the contract permits")
-MLC106 = ErrorCode("MLC106", "The dataset has more rows than the contract permits")
+SPX101 = ErrorCode("SPX101", "A required feature is missing from the data")
+SPX102 = ErrorCode("SPX102", "The data contains a column the contract does not declare")
+SPX103 = ErrorCode("SPX103", "Columns are not in the order the contract declares")
+SPX104 = ErrorCode("SPX104", "A column's type does not match the contract")
+SPX105 = ErrorCode("SPX105", "The dataset has fewer rows than the contract permits")
+SPX106 = ErrorCode("SPX106", "The dataset has more rows than the contract permits")
 
 # --------------------------------------------------------------------------
-# MLC2xx — value constraints
+# SPX2xx — value constraints
 # --------------------------------------------------------------------------
 
-MLC201 = ErrorCode("MLC201", "Null values in a feature declared not nullable")
-MLC202 = ErrorCode("MLC202", "Proportion of nulls exceeds the permitted maximum")
-MLC203 = ErrorCode("MLC203", "Values below the permitted minimum")
-MLC204 = ErrorCode("MLC204", "Values above the permitted maximum")
-MLC205 = ErrorCode("MLC205", "Values outside the permitted set")
-MLC206 = ErrorCode("MLC206", "Values not matching the required pattern")
-MLC207 = ErrorCode("MLC207", "Duplicate values in a feature declared unique")
-MLC208 = ErrorCode("MLC208", "Values whose type does not match the contract")
+SPX201 = ErrorCode("SPX201", "Null values in a feature declared not nullable")
+SPX202 = ErrorCode("SPX202", "Proportion of nulls exceeds the permitted maximum")
+SPX203 = ErrorCode("SPX203", "Values below the permitted minimum")
+SPX204 = ErrorCode("SPX204", "Values above the permitted maximum")
+SPX205 = ErrorCode("SPX205", "Values outside the permitted set")
+SPX206 = ErrorCode("SPX206", "Values not matching the required pattern")
+SPX207 = ErrorCode("SPX207", "Duplicate values in a feature declared unique")
+SPX208 = ErrorCode("SPX208", "Values whose type does not match the contract")
 
 # --------------------------------------------------------------------------
-# MLC6xx — compatibility
+# SPX6xx — compatibility
 # --------------------------------------------------------------------------
 
-MLC601 = ErrorCode("MLC601", "A change breaks compatibility in the direction checked")
-MLC602 = ErrorCode("MLC602", "The declared version increment is smaller than the changes require")
+SPX601 = ErrorCode("SPX601", "A change breaks compatibility in the direction checked")
+SPX602 = ErrorCode("SPX602", "The declared version increment is smaller than the changes require")
 
 # --------------------------------------------------------------------------
-# MLC9xx — integrations
+# SPX9xx — integrations
 # --------------------------------------------------------------------------
 
-MLC901 = ErrorCode("MLC901", "An optional dependency is required but not installed")
-MLC902 = ErrorCode("MLC902", "The data is of a kind no adapter can read")
+SPX901 = ErrorCode("SPX901", "An optional dependency is required but not installed")
+SPX902 = ErrorCode("SPX902", "The data is of a kind no adapter can read")
 
 
 REGISTRY: dict[str, ErrorCode] = {
     code.code: code
     for code in (
-        MLC001,
-        MLC002,
-        MLC003,
-        MLC004,
-        MLC005,
-        MLC006,
-        MLC007,
-        MLC008,
-        MLC009,
-        MLC010,
-        MLC011,
-        MLC012,
-        MLC013,
-        MLC014,
-        MLC101,
-        MLC102,
-        MLC103,
-        MLC104,
-        MLC105,
-        MLC106,
-        MLC201,
-        MLC202,
-        MLC203,
-        MLC204,
-        MLC205,
-        MLC206,
-        MLC207,
-        MLC901,
-        MLC902,
+        SPX001,
+        SPX002,
+        SPX003,
+        SPX004,
+        SPX005,
+        SPX006,
+        SPX007,
+        SPX008,
+        SPX009,
+        SPX010,
+        SPX011,
+        SPX012,
+        SPX013,
+        SPX014,
+        SPX101,
+        SPX102,
+        SPX103,
+        SPX104,
+        SPX105,
+        SPX106,
+        SPX201,
+        SPX202,
+        SPX203,
+        SPX204,
+        SPX205,
+        SPX206,
+        SPX207,
+        SPX901,
+        SPX902,
     )
 }
 """Every error code this release can raise, keyed by its identifier."""
 
 
-class MLContractError(Exception):
+class SchemaPactError(Exception):
     """Base class for every error this library raises.
 
-    Catching this catches everything from ``mlcontract`` and nothing else, so
+    Catching this catches everything from ``schemapact`` and nothing else, so
     callers can wrap library calls without swallowing unrelated failures.
 
     Attributes:
@@ -188,7 +188,7 @@ class MLContractError(Exception):
         super().__init__(f"[{code.code}] {message}")
 
 
-class ContractDefinitionError(MLContractError):
+class ContractDefinitionError(SchemaPactError):
     """The contract itself is invalid.
 
     Raised while building or loading a contract — bad types, contradictory
@@ -197,17 +197,17 @@ class ContractDefinitionError(MLContractError):
     """
 
 
-class ContractValidationError(MLContractError):
+class ContractValidationError(SchemaPactError):
     """Data failed to satisfy a valid contract.
 
     Distinct from :class:`ContractDefinitionError`: the contract is fine, the
     data is not. Raised only by
-    :meth:`~mlcontract.report.ValidationReport.raise_for_status`, never by
+    :meth:`~schemapact.report.ValidationReport.raise_for_status`, never by
     validation itself — validation returns a report so that every problem is
     visible at once.
 
     Attributes:
-        report: The full :class:`~mlcontract.report.ValidationReport`, so a
+        report: The full :class:`~schemapact.report.ValidationReport`, so a
             caller catching this still has access to every violation rather than
             just the summary in the message.
     """
@@ -227,17 +227,17 @@ class FeatureValidationError(ContractValidationError):
     """Individual values violate the constraints declared for their feature."""
 
 
-class CompatibilityError(MLContractError):
+class CompatibilityError(SchemaPactError):
     """A contract change is not compatible in the direction that was required.
 
     Raised only when a caller asks for it, via
-    :meth:`~mlcontract.compatibility.CompatibilityResult.raise_for_status`.
+    :meth:`~schemapact.compatibility.CompatibilityResult.raise_for_status`.
     Comparing contracts returns a result by default, because knowing *which*
     changes broke compatibility is the entire point.
 
     Attributes:
         result: The full
-            :class:`~mlcontract.compatibility.CompatibilityResult`.
+            :class:`~schemapact.compatibility.CompatibilityResult`.
     """
 
     def __init__(
@@ -247,7 +247,7 @@ class CompatibilityError(MLContractError):
         self.result = result
 
 
-class IntegrationError(MLContractError):
+class IntegrationError(SchemaPactError):
     """An optional dependency or third-party integration is unavailable.
 
     Always carries actionable installation guidance, because the alternative is
@@ -261,7 +261,7 @@ def missing_dependency(package: str, extra: str, purpose: str) -> IntegrationErr
 
     Args:
         package: The importable package that was missing, e.g. ``"yaml"``.
-        extra: The mlcontract extra that provides it, e.g. ``"yaml"``.
+        extra: The schemapact extra that provides it, e.g. ``"yaml"``.
         purpose: What the caller was trying to do, e.g. ``"read YAML contracts"``.
 
     Returns:
@@ -269,8 +269,8 @@ def missing_dependency(package: str, extra: str, purpose: str) -> IntegrationErr
     """
     return IntegrationError(
         f"{purpose} requires the optional '{extra}' extra, which provides "
-        f'{package!r}. Install it with:\n\n    pip install "mlcontract[{extra}]"',
-        code=MLC901,
+        f'{package!r}. Install it with:\n\n    pip install "schemapact[{extra}]"',
+        code=SPX901,
         package=package,
         extra=extra,
     )

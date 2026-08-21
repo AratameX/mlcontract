@@ -6,8 +6,8 @@ from typing import Any
 
 import pytest
 
-from mlcontract import Contract, ContractValidationError, DType, Feature, IntegrationError
-from mlcontract.adapters import CsvSource, MappingSource, resolve
+from schemapact import Contract, ContractValidationError, DType, Feature, IntegrationError
+from schemapact.adapters import CsvSource, MappingSource, resolve
 from tests._support import requires_no_pandas
 
 
@@ -137,7 +137,7 @@ class TestCsvSource:
             Feature("age", DType.INTEGER, min=18),
             Feature("country", DType.CATEGORICAL, allowed_values=["IN", "US"]),
         ).validate(path)
-        assert {v.code.code for v in report.violations} == {"MLC203", "MLC205"}
+        assert {v.code.code for v in report.violations} == {"SPX203", "SPX205"}
 
 
 class TestResolve:
@@ -164,13 +164,13 @@ class TestResolve:
     def test_missing_file(self, tmp_path):
         with pytest.raises(ContractValidationError) as exc:
             resolve(tmp_path / "absent.csv", contract(Feature("a", DType.INTEGER)))
-        assert exc.value.code.code == "MLC902"
+        assert exc.value.code.code == "SPX902"
 
     def test_unsupported_file_extension(self, tmp_path):
         path = write(tmp_path, "a\n1\n", name="data.parquet")
         with pytest.raises(ContractValidationError) as exc:
             resolve(path, contract(Feature("a", DType.INTEGER)))
-        assert exc.value.code.code == "MLC902"
+        assert exc.value.code.code == "SPX902"
 
     def test_sequence_of_non_mappings(self):
         with pytest.raises(ContractValidationError, match="not every item is a mapping"):
@@ -179,7 +179,7 @@ class TestResolve:
     def test_unsupported_object(self):
         with pytest.raises(ContractValidationError) as exc:
             resolve(42, contract(Feature("a", DType.INTEGER)))
-        assert exc.value.code.code == "MLC902"
+        assert exc.value.code.code == "SPX902"
 
     @requires_no_pandas
     def test_dataframe_without_the_extra_names_the_extra(self):
@@ -192,7 +192,7 @@ class TestResolve:
 
         with pytest.raises(IntegrationError) as exc:
             resolve(FakeFrame(), contract(Feature("a", DType.INTEGER)))
-        assert 'pip install "mlcontract[pandas]"' in str(exc.value)
+        assert 'pip install "schemapact[pandas]"' in str(exc.value)
 
 
 class TestCustomAdapter:
@@ -219,7 +219,7 @@ class TestCustomAdapter:
             return max((len(v) for v in self._columns.values()), default=0)
 
         def observed_dtype(self, column: str) -> DType | None:
-            from mlcontract._values import infer
+            from schemapact._values import infer
 
             return infer(self._columns[column])
 
@@ -234,7 +234,7 @@ class TestCustomAdapter:
     def test_a_foreign_source_validates(self):
         source = self.ColumnStore({"age": [30, 12]})
         report = contract(Feature("age", DType.INTEGER, min=18)).validate(source)
-        assert [v.code.code for v in report.violations] == ["MLC203"]
+        assert [v.code.code for v in report.violations] == ["SPX203"]
 
     def test_the_report_names_the_foreign_source(self):
         source = self.ColumnStore({"age": [30]})
@@ -251,7 +251,7 @@ class TestCustomAdapter:
         report = contract(Feature("a", DType.FLOAT, min=0)).validate(
             Liar({"a": [1.0, "not a number", -5.0]})
         )
-        assert [v.code.code for v in report.violations] == ["MLC203"]
+        assert [v.code.code for v in report.violations] == ["SPX203"]
 
 
 class TestByteOrderMarks:

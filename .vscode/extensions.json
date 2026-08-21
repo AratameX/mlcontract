@@ -1,5 +1,5 @@
 {
-  // Recommended for anyone working on mlcontract. VS Code offers these on first
+  // Recommended for anyone working on schemapact. VS Code offers these on first
   // open of the workspace. They mirror exactly what CI enforces, so problems
   // surface in the editor instead of in a failed build.
   "recommendations": [

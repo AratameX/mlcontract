@@ -6,8 +6,8 @@ import datetime as dt
 
 import pytest
 
-from mlcontract import DType
-from mlcontract._values import coerce, infer, is_missing
+from schemapact import DType
+from schemapact._values import coerce, infer, is_missing
 
 
 class TestIsMissing:

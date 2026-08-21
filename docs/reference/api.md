@@ -1,42 +1,42 @@
 # Python API
 
 Everything below is covered by the compatibility policy. Anything not listed in
-`mlcontract.__all__` is an internal detail and may change without notice.
+`schemapact.__all__` is an internal detail and may change without notice.
 
-::: mlcontract.contract.Contract
+::: schemapact.contract.Contract
 
-::: mlcontract.contract.Feature
+::: schemapact.contract.Feature
 
-::: mlcontract.dtypes.DType
+::: schemapact.dtypes.DType
 
-::: mlcontract.report.ValidationReport
+::: schemapact.report.ValidationReport
 
-::: mlcontract.report.Violation
+::: schemapact.report.Violation
 
-::: mlcontract.report.Sample
+::: schemapact.report.Sample
 
-::: mlcontract.report.Severity
+::: schemapact.report.Severity
 
-::: mlcontract.diff.ContractDiff
+::: schemapact.diff.ContractDiff
 
-::: mlcontract.diff.Change
+::: schemapact.diff.Change
 
-::: mlcontract.diff.ChangeKind
+::: schemapact.diff.ChangeKind
 
-::: mlcontract.diff.Impact
+::: schemapact.diff.Impact
 
-::: mlcontract.diff.VersionBump
+::: schemapact.diff.VersionBump
 
-::: mlcontract.compatibility.Compatibility
+::: schemapact.compatibility.Compatibility
 
-::: mlcontract.compatibility.CompatibilityResult
+::: schemapact.compatibility.CompatibilityResult
 
-::: mlcontract.exceptions.MLContractError
+::: schemapact.exceptions.SchemaPactError
 
-::: mlcontract.exceptions.ContractDefinitionError
+::: schemapact.exceptions.ContractDefinitionError
 
-::: mlcontract.exceptions.ContractValidationError
+::: schemapact.exceptions.ContractValidationError
 
-::: mlcontract.exceptions.CompatibilityError
+::: schemapact.exceptions.CompatibilityError
 
-::: mlcontract.exceptions.IntegrationError
+::: schemapact.exceptions.IntegrationError

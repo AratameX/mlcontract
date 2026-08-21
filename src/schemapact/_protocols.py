@@ -8,7 +8,7 @@ own backend.
 This is the single most consequential decision in the library. If the engine
 ever reaches for a pandas method directly, every future backend becomes a
 rewrite rather than a new file. The rule is absolute: nothing in
-:mod:`mlcontract._engine` may know what kind of data it is looking at.
+:mod:`schemapact._engine` may know what kind of data it is looking at.
 
 The protocol is deliberately small — six methods, all straightforward to
 implement over any tabular structure. Adding one is a cost paid by every adapter
@@ -27,7 +27,7 @@ from collections.abc import Collection, Iterator, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol, runtime_checkable
 
-from mlcontract.dtypes import DType
+from schemapact.dtypes import DType
 
 
 @dataclass(frozen=True, slots=True)

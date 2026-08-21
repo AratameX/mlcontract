@@ -1,7 +1,7 @@
 """Adapter for pandas DataFrames.
 
 Imported lazily and only on demand, so the core stays free of pandas. Nothing
-here is referenced by :mod:`mlcontract._engine`; the engine sees only the
+here is referenced by :mod:`schemapact._engine`; the engine sees only the
 data-source protocol.
 
 The interesting work is type mapping. pandas has many ways to spell the same
@@ -17,10 +17,10 @@ from collections.abc import Collection, Iterator
 from re import error as re_error
 from typing import TYPE_CHECKING, Any
 
-from mlcontract import _values
-from mlcontract._protocols import Failures
-from mlcontract.dtypes import DType
-from mlcontract.exceptions import missing_dependency
+from schemapact import _values
+from schemapact._protocols import Failures
+from schemapact.dtypes import DType
+from schemapact.exceptions import missing_dependency
 
 if TYPE_CHECKING:  # pragma: no cover
     import pandas as pd
@@ -187,7 +187,7 @@ class PandasSource:
     # ----------------------------------------------------------------------
     # Vectorised fast paths
     #
-    # These implement mlcontract._protocols.VectorisedSource. Each evaluates a
+    # These implement schemapact._protocols.VectorisedSource. Each evaluates a
     # whole column in one pandas operation instead of a Python loop, and each
     # returns None when it cannot express the check — the engine then falls back
     # to iteration, so correctness never depends on a fast path existing.

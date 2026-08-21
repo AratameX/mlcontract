@@ -105,7 +105,7 @@ contract.save("contract.json")
 Contract.load("contract.yaml") == Contract.load("contract.json")  # True
 ```
 
-JSON works in a bare install. YAML needs `pip install "mlcontract[yaml]"`.
+JSON works in a bare install. YAML needs `pip install "schemapact[yaml]"`.
 
 ## Unknown keys are rejected
 
@@ -117,7 +117,7 @@ features:
 ```
 
 ```
-ContractDefinitionError [MLC002]: Unrecognised key 'nullabe' in feature 'age'.
+ContractDefinitionError [SPX002]: Unrecognised key 'nullabe' in feature 'age'.
 Did you mean 'nullable'?
 ```
 

@@ -1,6 +1,6 @@
 """Render the error-code reference from the registry.
 
-The codes are data in :mod:`mlcontract.exceptions`, and this turns that data
+The codes are data in :mod:`schemapact.exceptions`, and this turns that data
 into ``docs/reference/errors.md``. Generating rather than hand-writing means the
 documentation cannot claim a code that does not exist, or miss one that does — a
 test asserts the file on disk matches what this script produces, so forgetting
@@ -15,7 +15,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from mlcontract.exceptions import REGISTRY
+from schemapact.exceptions import REGISTRY
 
 OUTPUT = Path(__file__).resolve().parent.parent / "docs" / "reference" / "errors.md"
 

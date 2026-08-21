@@ -17,7 +17,7 @@ queue of them.
 report.is_valid  # bool
 report.errors  # violations that invalidate the data
 report.warnings  # notable but not invalidating
-report.codes()  # ('MLC203', 'MLC205') — for alerting
+report.codes()  # ('SPX203', 'SPX205') — for alerting
 report.for_feature("age")
 report.summary()  # human-readable
 report.to_json()  # machine-readable
@@ -29,7 +29,7 @@ report.raise_for_status()  # opt into fail-fast
 Every violation answers what broke, where, how badly, and what to do:
 
 ```
-ERROR   MLC203 age: Column 'age' has 3 value(s) below the declared min of 18;
+ERROR   SPX203 age: Column 'age' has 3 value(s) below the declared min of 18;
         furthest is 12.
         e.g. row 41=12, row 88=15, row 203=17
         fix: Clip or filter the offending rows, or relax min if the data is
@@ -50,7 +50,7 @@ contract.validate(data, sample_values=False)
 ```
 
 ```bash
-mlcontract validate contract.yaml data.csv --no-samples
+schemapact validate contract.yaml data.csv --no-samples
 ```
 
 Counts and codes are still reported; only the values are withheld.

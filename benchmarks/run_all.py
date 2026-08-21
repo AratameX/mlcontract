@@ -32,7 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.quick:
         bench_validation.SIZES = (100, 1_000)
 
-    print("mlcontract benchmarks")
+    print("schemapact benchmarks")
     print(json.dumps(environment(), indent=2))
 
     suite = Suite()
