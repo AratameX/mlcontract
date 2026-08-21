@@ -16,7 +16,7 @@ While the project is pre-1.0, only the latest release receives security fixes.
 Use GitHub's private reporting: **Security → Report a vulnerability** on this
 repository. That creates a channel visible only to the maintainers.
 
-If that is unavailable, email **hawkeyes1818@gmail.com** with `mlcontract
+If that is unavailable, email **pranavbansode2604@gmail.com** with `mlcontract
 security` in the subject.
 
 Please include what you can: affected version, what an attacker could achieve,
