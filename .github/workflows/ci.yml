@@ -150,10 +150,10 @@ jobs:
         # available yet, add `--ignore-vuln <ID>` here with a comment saying why,
         # rather than deleting the step.
         #
-        # Retried because pip-audit queries PyPI's API per package, and a single
-        # reset connection would otherwise fail the build for reasons unrelated
-        # to security. A check that goes red on network weather teaches people to
-        # re-run it without reading it.
+        # Retried because pip-audit queries PyPI's API once per package, and a
+        # single reset connection would otherwise fail the build for reasons
+        # unrelated to security. A check that goes red on network weather teaches
+        # people to re-run it without reading it.
         run: |
           for attempt in 1 2 3; do
             pip-audit --strict --progress-spinner off && exit 0
