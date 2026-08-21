@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from mlcontract.exceptions import ErrorCode
+from schemapact.exceptions import ErrorCode
 
 
 class Severity(Enum):
@@ -226,7 +226,7 @@ class ValidationReport:
 
     def to_json(self, *, indent: int = 2) -> str:
         """Return the machine-readable form as JSON text."""
-        from mlcontract.serialization import encode_json
+        from schemapact.serialization import encode_json
 
         return encode_json(self.to_dict(), indent=indent)
 
@@ -241,7 +241,7 @@ class ValidationReport:
         if self.is_valid:
             return
 
-        from mlcontract.exceptions import ContractValidationError
+        from schemapact.exceptions import ContractValidationError
 
         first = self.errors[0]
         raise ContractValidationError(

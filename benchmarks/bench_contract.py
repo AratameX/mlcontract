@@ -12,7 +12,7 @@ import random
 from functools import partial
 
 from benchmarks._harness import Suite, announce, measure
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 
 COUNTRIES = ["IN", "US", "UK", "AU", "CA", "DE", "FR", "JP"]
 

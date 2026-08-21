@@ -85,7 +85,7 @@ def main() -> int:
     pytest_command = ["pytest", "-q"]
     if not args.fast:
         pytest_command += [
-            "--cov=mlcontract",
+            "--cov=schemapact",
             "--cov-branch",
             "--cov-report=term-missing",
         ]

@@ -1,15 +1,15 @@
-"""Executable contracts for machine-learning systems.
+"""Versioned data contracts.
 
-``mlcontract`` lets you declare the data and model interface an ML component
-expects, then validate real data against that declaration, compare contract
-versions, and fail CI when a change is breaking.
+``schemapact`` lets you declare the shape a dataset must have, validate real
+data against that declaration, compare contract versions, and fail CI when a
+change would break the systems downstream.
 
 The public API is intentionally small. Everything exported here is covered by
 the project's compatibility policy; anything not listed in :data:`__all__` is an
 internal implementation detail and may change without notice.
 
 Example:
-    >>> from mlcontract import Contract, DType, Feature
+    >>> from schemapact import Contract, DType, Feature
     >>> contract = Contract(
     ...     name="customer_features",
     ...     version="1.0.0",
@@ -21,21 +21,21 @@ Example:
 
 from __future__ import annotations
 
-from mlcontract._version import __version__
-from mlcontract.compatibility import Compatibility, CompatibilityResult
-from mlcontract.contract import SPEC_VERSION, Contract, Feature
-from mlcontract.diff import Change, ChangeKind, ContractDiff, Impact, VersionBump
-from mlcontract.dtypes import DType
-from mlcontract.exceptions import (
+from schemapact._version import __version__
+from schemapact.compatibility import Compatibility, CompatibilityResult
+from schemapact.contract import SPEC_VERSION, Contract, Feature
+from schemapact.diff import Change, ChangeKind, ContractDiff, Impact, VersionBump
+from schemapact.dtypes import DType
+from schemapact.exceptions import (
     CompatibilityError,
     ContractDefinitionError,
     ContractValidationError,
     FeatureValidationError,
     IntegrationError,
-    MLContractError,
+    SchemaPactError,
     SchemaValidationError,
 )
-from mlcontract.report import Sample, Severity, ValidationReport, Violation
+from schemapact.report import Sample, Severity, ValidationReport, Violation
 
 
 def validate(
@@ -79,8 +79,8 @@ __all__ = [
     "FeatureValidationError",
     "Impact",
     "IntegrationError",
-    "MLContractError",
     "Sample",
+    "SchemaPactError",
     "SchemaValidationError",
     "Severity",
     "ValidationReport",

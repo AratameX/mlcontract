@@ -1,6 +1,6 @@
-# mlcontract
+# schemapact
 
-**Executable contracts for ML systems — validate data, models and predictions before they break production.**
+**Versioned data contracts that catch breaking schema changes before they reach production.**
 
 ## The problem
 
@@ -19,7 +19,7 @@ out from a dashboard a week later.
 Write the assumptions down in a form a machine can check.
 
 ```python
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 
 contract = Contract(
     name="customer_features",
@@ -41,7 +41,7 @@ Plenty of libraries validate a dataframe. The distinguishing question here is
 not "is this data valid?" but **"will this change break the people downstream?"**
 
 ```bash
-mlcontract check-compatibility contracts/v1.yaml contracts/v2.yaml --mode backward
+schemapact check-compatibility contracts/v1.yaml contracts/v2.yaml --mode backward
 ```
 
 Contracts are versioned and diffable. Comparing two versions tells you what

@@ -1,6 +1,6 @@
 """Guards the public API surface against accidental change.
 
-``mlcontract.__all__`` is the project's compatibility promise. This test pins it
+``schemapact.__all__`` is the project's compatibility promise. This test pins it
 to an explicit snapshot, so removing or renaming a public symbol cannot happen
 as a silent side effect of a refactor — it fails CI and forces the change to be
 made deliberately, in the same commit, with a changelog entry.
@@ -15,7 +15,7 @@ conventions is worse than one.
 
 from __future__ import annotations
 
-import mlcontract
+import schemapact
 
 EXPECTED_PUBLIC_API = frozenset(
     {
@@ -34,7 +34,7 @@ EXPECTED_PUBLIC_API = frozenset(
         "FeatureValidationError",
         "Impact",
         "IntegrationError",
-        "MLContractError",
+        "SchemaPactError",
         "Sample",
         "SchemaValidationError",
         "Severity",
@@ -48,7 +48,7 @@ EXPECTED_PUBLIC_API = frozenset(
 
 
 def test_public_api_matches_snapshot():
-    actual = frozenset(mlcontract.__all__)
+    actual = frozenset(schemapact.__all__)
 
     removed = EXPECTED_PUBLIC_API - actual
     added = actual - EXPECTED_PUBLIC_API
@@ -63,10 +63,10 @@ def test_public_api_matches_snapshot():
 
 
 def test_every_exported_name_resolves():
-    for name in mlcontract.__all__:
-        assert hasattr(mlcontract, name), f"__all__ advertises {name!r} but it does not exist"
+    for name in schemapact.__all__:
+        assert hasattr(schemapact, name), f"__all__ advertises {name!r} but it does not exist"
 
 
 def test_no_private_names_are_exported():
-    leaked = [n for n in mlcontract.__all__ if n.startswith("_") and not n.startswith("__")]
+    leaked = [n for n in schemapact.__all__ if n.startswith("_") and not n.startswith("__")]
     assert not leaked, f"Private names leaked into the public API: {leaked}"

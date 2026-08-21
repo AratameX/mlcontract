@@ -16,7 +16,7 @@ from typing import Any
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 from tests._support import requires_yaml
 
 # Identifiers that are legal feature names and survive both encodings.

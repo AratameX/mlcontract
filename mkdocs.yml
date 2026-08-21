@@ -1,8 +1,8 @@
-site_name: mlcontract
+site_name: schemapact
 site_description: Executable contracts for ML systems.
-site_url: https://AratameX.github.io/mlcontract/
-repo_url: https://github.com/AratameX/mlcontract
-repo_name: AratameX/mlcontract
+site_url: https://AratameX.github.io/schemapact/
+repo_url: https://github.com/AratameX/schemapact
+repo_name: AratameX/schemapact
 edit_uri: edit/main/docs/
 
 theme:

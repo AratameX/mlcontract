@@ -53,7 +53,7 @@ print(changes.summary())
 ```
 
 ```python
-from mlcontract import Compatibility
+from schemapact import Compatibility
 
 result = v1.is_compatible_with(v2, Compatibility.FULL)
 if not result.is_compatible:
@@ -74,7 +74,7 @@ broken by an upgrade they had every reason to believe was safe. That check is
 one flag:
 
 ```bash
-mlcontract diff v1.yaml v2.yaml --require-version-bump
+schemapact diff v1.yaml v2.yaml --require-version-bump
 ```
 
 ## In CI
@@ -83,7 +83,7 @@ mlcontract diff v1.yaml v2.yaml --require-version-bump
 - name: Contract compatibility
   run: |
     git show origin/main:contracts/model_input.yaml > /tmp/base.yaml
-    mlcontract check-compatibility /tmp/base.yaml contracts/model_input.yaml \
+    schemapact check-compatibility /tmp/base.yaml contracts/model_input.yaml \
       --mode backward
 ```
 

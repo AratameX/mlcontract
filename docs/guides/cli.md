@@ -1,11 +1,11 @@
 # Command line
 
 ```bash
-mlcontract validate CONTRACT DATA
-mlcontract diff OLD NEW
-mlcontract check-compatibility OLD NEW --mode backward|forward|full
-mlcontract init [--from-csv PATH]
-mlcontract version
+schemapact validate CONTRACT DATA
+schemapact diff OLD NEW
+schemapact check-compatibility OLD NEW --mode backward|forward|full
+schemapact init [--from-csv PATH]
+schemapact version
 ```
 
 ## Exit codes
@@ -30,18 +30,18 @@ and "fix your path" is different advice from "fix your schema".
 ## validate
 
 ```bash
-mlcontract validate contract.yaml data.csv
-mlcontract validate contract.yaml data.csv --format json
-mlcontract validate contract.yaml data.csv --fail-on warning
-mlcontract validate contract.yaml data.csv --no-samples
-mlcontract validate contract.yaml data.csv --max-samples 20
+schemapact validate contract.yaml data.csv
+schemapact validate contract.yaml data.csv --format json
+schemapact validate contract.yaml data.csv --fail-on warning
+schemapact validate contract.yaml data.csv --no-samples
+schemapact validate contract.yaml data.csv --max-samples 20
 ```
 
 ## diff
 
 ```bash
-mlcontract diff v1.yaml v2.yaml
-mlcontract diff v1.yaml v2.yaml --require-version-bump
+schemapact diff v1.yaml v2.yaml
+schemapact diff v1.yaml v2.yaml --require-version-bump
 ```
 
 Exits `2` on a breaking change, and with `--require-version-bump`, also when the
@@ -50,7 +50,7 @@ declared version increment is too small for what changed.
 ## check-compatibility
 
 ```bash
-mlcontract check-compatibility v1.yaml v2.yaml --mode backward
+schemapact check-compatibility v1.yaml v2.yaml --mode backward
 ```
 
 See [Breaking changes](compatibility.md) for what each mode means.
@@ -58,10 +58,10 @@ See [Breaking changes](compatibility.md) for what each mode means.
 ## init
 
 ```bash
-mlcontract init                                  # a commented example
-mlcontract init --from-csv data.csv              # inferred from real data
-mlcontract init --from-csv data.csv --infer-ranges
-mlcontract init --from-csv data.csv -o contracts/input.json --name model_input
+schemapact init                                  # a commented example
+schemapact init --from-csv data.csv              # inferred from real data
+schemapact init --from-csv data.csv --infer-ranges
+schemapact init --from-csv data.csv -o contracts/input.json --name model_input
 ```
 
 Inference reads types but not ranges. A bound taken from a sample rejects
@@ -75,19 +75,19 @@ Errors are written to standard error, so standard output stays valid JSON even
 when a command fails:
 
 ```bash
-mlcontract validate contract.yaml data.csv --format json | jq '.violations[].code'
+schemapact validate contract.yaml data.csv --format json | jq '.violations[].code'
 ```
 
 ## In GitHub Actions
 
 ```yaml
-- run: pip install "mlcontract[yaml,pandas]"
+- run: pip install "schemapact[yaml,pandas]"
 
 - name: Validate data
-  run: mlcontract validate contracts/input.yaml data/sample.csv
+  run: schemapact validate contracts/input.yaml data/sample.csv
 
 - name: Contract compatibility
   run: |
     git show origin/main:contracts/input.yaml > /tmp/base.yaml
-    mlcontract check-compatibility /tmp/base.yaml contracts/input.yaml --mode backward
+    schemapact check-compatibility /tmp/base.yaml contracts/input.yaml --mode backward
 ```

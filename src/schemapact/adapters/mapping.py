@@ -1,7 +1,7 @@
 """Adapters for data structures available in the standard library.
 
 Neither of these needs a third-party package, which is what makes
-``pip install mlcontract`` immediately useful and keeps the engine honest: if a
+``pip install schemapact`` immediately useful and keeps the engine honest: if a
 pandas assumption ever leaked into the core, these adapters would break and CI
 would catch it.
 """
@@ -13,11 +13,11 @@ from collections.abc import Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from mlcontract import _values
-from mlcontract.dtypes import DType
+from schemapact import _values
+from schemapact.dtypes import DType
 
 if TYPE_CHECKING:
-    from mlcontract.contract import Contract
+    from schemapact.contract import Contract
 
 
 class MappingSource:

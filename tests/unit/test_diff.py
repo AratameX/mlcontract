@@ -12,7 +12,7 @@ from typing import Any, ClassVar
 
 import pytest
 
-from mlcontract import (
+from schemapact import (
     ChangeKind,
     Compatibility,
     CompatibilityError,
@@ -440,7 +440,7 @@ class TestCompatibilityResultApi:
         result = old.is_compatible_with(new)
         with pytest.raises(CompatibilityError) as exc:
             result.raise_for_status()
-        assert exc.value.code.code == "MLC601"
+        assert exc.value.code.code == "SPX601"
         assert exc.value.result is result
 
     def test_summary_when_compatible(self):

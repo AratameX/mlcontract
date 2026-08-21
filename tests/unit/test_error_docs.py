@@ -1,6 +1,6 @@
 """The error-code reference must match the registry.
 
-The page is rendered from `mlcontract.exceptions.REGISTRY`, so it cannot claim a
+The page is rendered from `schemapact.exceptions.REGISTRY`, so it cannot claim a
 code that does not exist. It can still go stale the other way — someone adds a
 code and forgets to regenerate — and documentation that silently omits a code
 people will see in their logs is worse than none.
@@ -12,7 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from mlcontract.exceptions import REGISTRY
+from schemapact.exceptions import REGISTRY
 
 ROOT = Path(__file__).resolve().parents[2]
 GENERATOR = ROOT / "scripts" / "generate_error_docs.py"

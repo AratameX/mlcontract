@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from mlcontract import (
+from schemapact import (
     Contract,
     ContractValidationError,
     DType,
@@ -53,7 +53,7 @@ class TestCleanData:
 class TestStructure:
     def test_missing_required_column(self):
         report = contract(Feature("age", DType.INTEGER)).validate([{"other": 1}])
-        assert "MLC101" in codes(report)
+        assert "SPX101" in codes(report)
         assert not report.is_valid
 
     def test_missing_optional_column_is_fine(self):
@@ -68,14 +68,14 @@ class TestStructure:
         report = contract(Feature("age", DType.INTEGER)).validate([{"age": 1, "extra": 2}])
         assert report.is_valid
         assert [v.severity for v in report.violations] == [Severity.WARNING]
-        assert "MLC102" in codes(report)
+        assert "SPX102" in codes(report)
 
     def test_extra_column_is_an_error_when_disallowed(self):
         report = contract(Feature("age", DType.INTEGER), allow_extra_columns=False).validate(
             [{"age": 1, "extra": 2}]
         )
         assert not report.is_valid
-        assert "MLC102" in codes(report)
+        assert "SPX102" in codes(report)
 
     def test_column_order_ignored_by_default(self):
         report = contract(Feature("a", DType.INTEGER), Feature("b", DType.INTEGER)).validate(
@@ -89,11 +89,11 @@ class TestStructure:
             Feature("b", DType.INTEGER),
             enforce_column_order=True,
         ).validate([{"b": 1, "a": 2}])
-        assert "MLC103" in codes(report)
+        assert "SPX103" in codes(report)
 
     def test_dtype_mismatch(self):
         report = contract(Feature("age", DType.INTEGER)).validate([{"age": "thirty"}])
-        assert "MLC104" in codes(report)
+        assert "SPX104" in codes(report)
 
     def test_integer_data_satisfies_a_float_contract(self):
         """Widening is safe: every integer is a valid float."""
@@ -102,26 +102,26 @@ class TestStructure:
 
     def test_float_data_fails_an_integer_contract(self):
         report = contract(Feature("x", DType.INTEGER)).validate([{"x": 1.5}])
-        assert "MLC104" in codes(report)
+        assert "SPX104" in codes(report)
 
     def test_booleans_are_not_integers(self):
         report = contract(Feature("x", DType.INTEGER)).validate([{"x": True}])
-        assert "MLC104" in codes(report)
+        assert "SPX104" in codes(report)
 
     def test_too_few_rows(self):
         report = contract(Feature("a", DType.INTEGER), min_rows=5).validate([{"a": 1}])
-        assert "MLC105" in codes(report)
+        assert "SPX105" in codes(report)
 
     def test_too_many_rows(self):
         report = contract(Feature("a", DType.INTEGER), max_rows=1).validate([{"a": 1}, {"a": 2}])
-        assert "MLC106" in codes(report)
+        assert "SPX106" in codes(report)
 
     def test_value_checks_are_skipped_after_a_type_failure(self):
         """A type failure must not cascade into every value rule also failing."""
         report = contract(Feature("age", DType.INTEGER, min=18, max=99)).validate(
             [{"age": "x"}, {"age": "y"}]
         )
-        assert codes(report) == ["MLC104"]
+        assert codes(report) == ["SPX104"]
 
 
 class TestValues:
@@ -129,11 +129,11 @@ class TestValues:
         report = contract(Feature("age", DType.INTEGER, nullable=False)).validate(
             [{"age": 30}, {"age": None}]
         )
-        assert "MLC201" in codes(report)
+        assert "SPX201" in codes(report)
 
     def test_absent_key_counts_as_null(self):
         report = contract(Feature("age", DType.INTEGER, nullable=False)).validate([{"age": 30}, {}])
-        assert "MLC201" in codes(report)
+        assert "SPX201" in codes(report)
 
     def test_nulls_allowed_by_default(self):
         report = contract(Feature("age", DType.INTEGER)).validate([{"age": None}, {"age": 3}])
@@ -143,7 +143,7 @@ class TestValues:
         report = contract(Feature("a", DType.INTEGER, max_null_fraction=0.25)).validate(
             [{"a": 1}, {"a": None}, {"a": None}, {"a": 4}]
         )
-        assert "MLC202" in codes(report)
+        assert "SPX202" in codes(report)
 
     def test_null_fraction_within_limit(self):
         report = contract(Feature("a", DType.INTEGER, max_null_fraction=0.5)).validate(
@@ -155,11 +155,11 @@ class TestValues:
         report = contract(Feature("age", DType.INTEGER, min=18)).validate(
             [{"age": 30}, {"age": 12}]
         )
-        assert "MLC203" in codes(report)
+        assert "SPX203" in codes(report)
 
     def test_above_max(self):
         report = contract(Feature("age", DType.INTEGER, max=120)).validate([{"age": 500}])
-        assert "MLC204" in codes(report)
+        assert "SPX204" in codes(report)
 
     def test_bounds_are_inclusive(self):
         report = contract(Feature("age", DType.INTEGER, min=18, max=20)).validate(
@@ -171,19 +171,19 @@ class TestValues:
         report = contract(Feature("c", DType.CATEGORICAL, allowed_values=["IN", "US"])).validate(
             [{"c": "IN"}, {"c": "FR"}]
         )
-        assert "MLC205" in codes(report)
+        assert "SPX205" in codes(report)
 
     def test_pattern_mismatch(self):
         report = contract(Feature("e", DType.STRING, pattern=r"^[^@]+@[^@]+$")).validate(
             [{"e": "a@b.com"}, {"e": "nope"}]
         )
-        assert "MLC206" in codes(report)
+        assert "SPX206" in codes(report)
 
     def test_duplicates_in_a_unique_feature(self):
         report = contract(Feature("id", DType.INTEGER, unique=True)).validate(
             [{"id": 1}, {"id": 2}, {"id": 1}]
         )
-        assert "MLC207" in codes(report)
+        assert "SPX207" in codes(report)
 
     def test_unique_feature_with_no_duplicates(self):
         report = contract(Feature("id", DType.INTEGER, unique=True)).validate(
@@ -204,7 +204,7 @@ class TestValues:
             Feature("age", DType.INTEGER, nullable=False, min=18),
             Feature("c", DType.CATEGORICAL, allowed_values=["IN"]),
         ).validate([{"age": None, "c": "FR"}, {"age": 5, "c": "IN"}])
-        assert set(codes(report)) == {"MLC201", "MLC203", "MLC205"}
+        assert set(codes(report)) == {"SPX201", "SPX203", "SPX205"}
 
 
 class TestViolationDetail:
@@ -255,7 +255,7 @@ class TestReportApi:
 
     def test_codes_are_exposed_for_alerting(self):
         report = contract(Feature("a", DType.INTEGER, min=0)).validate([{"a": -1}])
-        assert "MLC203" in report.codes()
+        assert "SPX203" in report.codes()
 
     def test_to_dict_is_json_safe(self):
         import json
@@ -300,7 +300,7 @@ class TestReportContainerBehaviour:
 
     def test_iteration_yields_violations(self):
         report = contract(Feature("a", DType.INTEGER, min=0)).validate([{"a": -1}])
-        assert [v.code.code for v in report] == ["MLC203"]
+        assert [v.code.code for v in report] == ["SPX203"]
 
     def test_no_truthiness_shortcut(self):
         """Truthiness is deliberately undefined: it could mean either opposite."""
@@ -315,7 +315,7 @@ class TestReportContainerBehaviour:
     def test_violation_str_is_log_friendly(self):
         report = contract(Feature("age", DType.INTEGER, min=18)).validate([{"age": 1}])
         line = str(report.violations[0])
-        assert line.startswith("MLC203")
+        assert line.startswith("SPX203")
         assert "[age]" in line
 
     def test_severity_str_is_the_wire_value(self):
@@ -339,14 +339,14 @@ class TestEdgeCases:
             Feature("b", DType.INTEGER),
             enforce_column_order=True,
         ).validate([{"a": 1, "extra": 0, "b": 2}])
-        assert "MLC103" not in codes(report)
+        assert "SPX103" not in codes(report)
 
     def test_range_check_ignores_non_numeric_values(self):
         """A mixed column already failed typing; range must not also explode."""
         report = contract(Feature("a", DType.FLOAT, min=0), allow_extra_columns=True).validate(
             [{"a": 1.0}, {"a": "x"}]
         )
-        assert codes(report) == ["MLC104"]
+        assert codes(report) == ["SPX104"]
 
     def test_pattern_passing_produces_no_violation(self):
         report = contract(Feature("e", DType.STRING, pattern=r"^\w+$")).validate(
@@ -358,18 +358,18 @@ class TestEdgeCases:
 class TestBoundsIndependently:
     def test_only_max_declared(self):
         report = contract(Feature("a", DType.INTEGER, max=10)).validate([{"a": 5}, {"a": 50}])
-        assert codes(report) == ["MLC204"]
+        assert codes(report) == ["SPX204"]
 
     def test_only_min_declared(self):
         report = contract(Feature("a", DType.INTEGER, min=10)).validate([{"a": 5}, {"a": 50}])
-        assert codes(report) == ["MLC203"]
+        assert codes(report) == ["SPX203"]
 
     def test_both_bounds_violated_are_reported_separately(self):
         report = contract(Feature("a", DType.INTEGER, min=0, max=10)).validate(
             [{"a": -5}, {"a": 50}]
         )
-        assert set(codes(report)) == {"MLC203", "MLC204"}
+        assert set(codes(report)) == {"SPX203", "SPX204"}
 
     def test_float_values_against_float_bounds(self):
         report = contract(Feature("a", DType.FLOAT, min=0.5)).validate([{"a": 0.25}])
-        assert codes(report) == ["MLC203"]
+        assert codes(report) == ["SPX203"]

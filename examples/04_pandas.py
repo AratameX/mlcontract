@@ -2,7 +2,7 @@
 
 Requires the pandas extra:
 
-    pip install "mlcontract[pandas]"
+    pip install "schemapact[pandas]"
     python examples/04_pandas.py
 """
 
@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import sys
 
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 
 
 def main() -> int:
@@ -18,7 +18,7 @@ def main() -> int:
     try:
         import pandas as pd
     except ImportError:
-        print('This example needs pandas:  pip install "mlcontract[pandas]"')
+        print('This example needs pandas:  pip install "schemapact[pandas]"')
         return 0
 
     contract = Contract(
@@ -32,7 +32,7 @@ def main() -> int:
     )
 
     # `age` holds a null, so pandas stores this column as float64 even though
-    # the values are integers. mlcontract recognises that promotion and does not
+    # the values are integers. schemapact recognises that promotion and does not
     # report a spurious type violation.
     frame = pd.DataFrame(
         {

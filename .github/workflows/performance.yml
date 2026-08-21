@@ -10,8 +10,8 @@ on:
     # Only when the benchmarks or the code paths they measure change.
     paths:
       - "benchmarks/**"
-      - "src/mlcontract/_engine.py"
-      - "src/mlcontract/adapters/**"
+      - "src/schemapact/_engine.py"
+      - "src/schemapact/adapters/**"
 
 permissions:
   contents: read

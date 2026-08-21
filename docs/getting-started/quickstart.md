@@ -5,7 +5,7 @@
 The fastest start is to read one off data you already have:
 
 ```bash
-mlcontract init --from-csv customers.csv --output contract.yaml
+schemapact init --from-csv customers.csv --output contract.yaml
 ```
 
 ```yaml
@@ -31,14 +31,14 @@ but observed minima and maxima do not, so ranges are left out unless you pass
 ## 2. Validate
 
 ```bash
-mlcontract validate contract.yaml customers.csv
+schemapact validate contract.yaml customers.csv
 ```
 
 ```
 customers v0.1.0 against customers.csv (1204 rows)
 FAILED: 1 error(s), 0 warning(s)
 
-  ERROR   MLC203 age: Column 'age' has 3 value(s) below the declared min of 18;
+  ERROR   SPX203 age: Column 'age' has 3 value(s) below the declared min of 18;
           furthest is 12.
           e.g. row 41=12, row 88=15, row 203=17
           fix: Clip or filter the offending rows, or relax min if the data is
@@ -48,7 +48,7 @@ FAILED: 1 error(s), 0 warning(s)
 Or from Python:
 
 ```python
-from mlcontract import Contract
+from schemapact import Contract
 
 contract = Contract.load("contract.yaml")
 report = contract.validate(dataframe)
@@ -66,7 +66,7 @@ has several problems at once and you want all of them from one run. Call
 Commit the contract, then check every proposed change against it:
 
 ```bash
-mlcontract check-compatibility contracts/v1.yaml contracts/v2.yaml --mode backward
+schemapact check-compatibility contracts/v1.yaml contracts/v2.yaml --mode backward
 ```
 
 Exit code 2 means the change breaks existing data. Wire that into CI and an

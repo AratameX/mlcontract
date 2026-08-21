@@ -18,30 +18,30 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from mlcontract import serialization
-from mlcontract.constraints import CONSTRAINTS
-from mlcontract.dtypes import DType
-from mlcontract.exceptions import (
-    MLC001,
-    MLC002,
-    MLC003,
-    MLC004,
-    MLC005,
-    MLC007,
-    MLC008,
-    MLC009,
-    MLC010,
-    MLC011,
-    MLC012,
-    MLC013,
-    MLC014,
+from schemapact import serialization
+from schemapact.constraints import CONSTRAINTS
+from schemapact.dtypes import DType
+from schemapact.exceptions import (
+    SPX001,
+    SPX002,
+    SPX003,
+    SPX004,
+    SPX005,
+    SPX007,
+    SPX008,
+    SPX009,
+    SPX010,
+    SPX011,
+    SPX012,
+    SPX013,
+    SPX014,
     ContractDefinitionError,
 )
 
 if TYPE_CHECKING:
-    from mlcontract.compatibility import Compatibility, CompatibilityResult
-    from mlcontract.diff import ContractDiff
-    from mlcontract.report import ValidationReport
+    from schemapact.compatibility import Compatibility, CompatibilityResult
+    from schemapact.diff import ContractDiff
+    from schemapact.report import ValidationReport
 
 SPEC_VERSION = "1"
 """The contract *file format* version written by this release.
@@ -98,9 +98,9 @@ class Feature:
     Args:
         name: The column or key this feature refers to.
         dtype: Its canonical type. The annotation is
-            :class:`~mlcontract.dtypes.DType` so that typed callers get
+            :class:`~schemapact.dtypes.DType` so that typed callers get
             autocompletion and are steered to the canonical set. At runtime any
-            alias understood by :meth:`~mlcontract.dtypes.DType.parse` is also
+            alias understood by :meth:`~schemapact.dtypes.DType.parse` is also
             accepted, which is how strings arriving from contract files are
             handled.
         nullable: Whether null values are permitted at all.
@@ -221,7 +221,7 @@ class Feature:
         if "type" not in data:
             raise ContractDefinitionError(
                 f"Feature {name!r} does not declare a type.",
-                code=MLC011,
+                code=SPX011,
                 feature=name,
             )
 
@@ -246,7 +246,7 @@ class Feature:
         if not _is_nonempty_str(self.name):
             raise ContractDefinitionError(
                 f"Feature names must be non-empty strings, got {self.name!r}.",
-                code=MLC001,
+                code=SPX001,
                 feature=self.name,
             )
 
@@ -259,7 +259,7 @@ class Feature:
                 raise ContractDefinitionError(
                     f"Feature {self.name!r} is of type {self.dtype} and cannot use the "
                     f"{name!r} constraint, which applies to: {permitted}.",
-                    code=MLC008,
+                    code=SPX008,
                     feature=self.name,
                     constraint=name,
                     dtype=str(self.dtype),
@@ -271,7 +271,7 @@ class Feature:
             if value is not None and not _is_real_number(value):
                 raise ContractDefinitionError(
                     f"Feature {self.name!r} has a non-numeric {bound!r} bound: {value!r}.",
-                    code=MLC007,
+                    code=SPX007,
                     feature=self.name,
                     constraint=bound,
                 )
@@ -280,7 +280,7 @@ class Feature:
             raise ContractDefinitionError(
                 f"Feature {self.name!r} has min={self.min} greater than max={self.max}, "
                 "so no value could ever satisfy it.",
-                code=MLC009,
+                code=SPX009,
                 feature=self.name,
                 min=self.min,
                 max=self.max,
@@ -294,7 +294,7 @@ class Feature:
             raise ContractDefinitionError(
                 f"Feature {self.name!r} declares an empty allowed_values set, so no value "
                 "could ever satisfy it. Omit the constraint to allow any value.",
-                code=MLC007,
+                code=SPX007,
                 feature=self.name,
             )
 
@@ -303,7 +303,7 @@ class Feature:
             raise ContractDefinitionError(
                 f"Feature {self.name!r} lists duplicate allowed values: "
                 f"{sorted(map(str, duplicates))}.",
-                code=MLC007,
+                code=SPX007,
                 feature=self.name,
                 duplicates=sorted(map(str, duplicates)),
             )
@@ -313,7 +313,7 @@ class Feature:
                 raise ContractDefinitionError(
                     f"Feature {self.name!r} is of type {self.dtype} but allows the value "
                     f"{value!r}, which is a {type(value).__name__}.",
-                    code=MLC007,
+                    code=SPX007,
                     feature=self.name,
                     value=value,
                 )
@@ -326,7 +326,7 @@ class Feature:
         except re.error as exc:
             raise ContractDefinitionError(
                 f"Feature {self.name!r} has an invalid regular expression {self.pattern!r}: {exc}.",
-                code=MLC007,
+                code=SPX007,
                 feature=self.name,
                 pattern=self.pattern,
             ) from exc
@@ -339,7 +339,7 @@ class Feature:
             raise ContractDefinitionError(
                 f"Feature {self.name!r} has max_null_fraction={self.max_null_fraction!r}, "
                 "which must be a number between 0 and 1.",
-                code=MLC007,
+                code=SPX007,
                 feature=self.name,
             )
 
@@ -347,7 +347,7 @@ class Feature:
             raise ContractDefinitionError(
                 f"Feature {self.name!r} is not nullable but permits a null fraction of "
                 f"{self.max_null_fraction}. Set nullable=True, or drop max_null_fraction.",
-                code=MLC009,
+                code=SPX009,
                 feature=self.name,
             )
 
@@ -355,21 +355,21 @@ class Feature:
         if self.name in self.previous_names:
             raise ContractDefinitionError(
                 f"Feature {self.name!r} lists its own name among previous_names.",
-                code=MLC013,
+                code=SPX013,
                 feature=self.name,
             )
         duplicates = _duplicates(self.previous_names)
         if duplicates:
             raise ContractDefinitionError(
                 f"Feature {self.name!r} repeats {sorted(duplicates)} in previous_names.",
-                code=MLC013,
+                code=SPX013,
                 feature=self.name,
             )
 
 
 @dataclass(frozen=True, slots=True)
 class Contract:
-    """A versioned description of the data an ML component expects.
+    """A versioned description of the data a component expects.
 
     Args:
         name: Identifies the contract. Stable across versions.
@@ -524,7 +524,7 @@ class Contract:
             if required not in data:
                 raise ContractDefinitionError(
                     f"Contract document is missing the required key {required!r}.",
-                    code=MLC011,
+                    code=SPX011,
                     key=required,
                 )
 
@@ -593,7 +593,7 @@ class Contract:
         except OSError as exc:
             raise ContractDefinitionError(
                 f"Could not read contract file {location}: {exc.strerror or exc}.",
-                code=MLC010,
+                code=SPX010,
                 path=str(location),
             ) from exc
 
@@ -632,7 +632,7 @@ class Contract:
         Does **not** raise when the data is invalid. A real dataset usually has
         several problems at once, and raising on the first one turns a single CI
         run into a queue of them. Call
-        :meth:`~mlcontract.report.ValidationReport.raise_for_status` on the
+        :meth:`~schemapact.report.ValidationReport.raise_for_status` on the
         result if you want fail-fast behaviour.
 
         Args:
@@ -662,7 +662,7 @@ class Contract:
             >>> report.is_valid
             False
         """
-        from mlcontract import _engine, adapters
+        from schemapact import _engine, adapters
 
         return _engine.run(
             self,
@@ -701,7 +701,7 @@ class Contract:
             >>> str(changes.required_bump)
             'major'
         """
-        from mlcontract.diff import compare
+        from schemapact.diff import compare
 
         return compare(self, other)
 
@@ -722,8 +722,8 @@ class Contract:
             The outcome, naming which changes broke it and in which direction.
             Call ``raise_for_status()`` on it to fail fast instead.
         """
-        from mlcontract.compatibility import Compatibility as _Mode
-        from mlcontract.compatibility import check
+        from schemapact.compatibility import Compatibility as _Mode
+        from schemapact.compatibility import check
 
         return check(self, other, _Mode(mode) if isinstance(mode, str) else mode)
 
@@ -736,7 +736,7 @@ class Contract:
         if not _is_nonempty_str(self.name):
             raise ContractDefinitionError(
                 f"Contract names must be non-empty strings, got {self.name!r}.",
-                code=MLC001,
+                code=SPX001,
                 name=self.name,
             )
 
@@ -745,7 +745,7 @@ class Contract:
             raise ContractDefinitionError(
                 f"Contract {self.name!r} has version {self.version!r}, which is not a valid "
                 "semantic version. Use MAJOR.MINOR.PATCH, for example '1.0.0'.",
-                code=MLC004,
+                code=SPX004,
                 version=self.version,
             )
 
@@ -754,9 +754,9 @@ class Contract:
             supported = ", ".join(sorted(SUPPORTED_SPEC_VERSIONS))
             raise ContractDefinitionError(
                 f"Contract {self.name!r} declares format version {self.spec_version!r}, which "
-                f"this release of mlcontract cannot read. Supported: {supported}. "
-                "Upgrade mlcontract to read newer contracts.",
-                code=MLC003,
+                f"this release of schemapact cannot read. Supported: {supported}. "
+                "Upgrade schemapact to read newer contracts.",
+                code=SPX003,
                 spec_version=self.spec_version,
             )
 
@@ -765,7 +765,7 @@ class Contract:
             raise ContractDefinitionError(
                 f"Contract {self.name!r} declares no features. A contract that describes "
                 "nothing cannot validate anything.",
-                code=MLC012,
+                code=SPX012,
                 name=self.name,
             )
 
@@ -773,7 +773,7 @@ class Contract:
             if not isinstance(item, Feature):
                 raise ContractDefinitionError(
                     f"Contract {self.name!r} contains {item!r}, which is not a Feature.",
-                    code=MLC010,
+                    code=SPX010,
                     name=self.name,
                 )
 
@@ -782,7 +782,7 @@ class Contract:
         if duplicates:
             raise ContractDefinitionError(
                 f"Contract {self.name!r} declares duplicate feature names: {sorted(duplicates)}.",
-                code=MLC005,
+                code=SPX005,
                 duplicates=sorted(duplicates),
             )
 
@@ -794,7 +794,7 @@ class Contract:
                     f"Feature {item.name!r} lists {sorted(collisions)} as previous names, but "
                     "those are still live features in this contract. A rename cannot point at "
                     "a name that still exists.",
-                    code=MLC013,
+                    code=SPX013,
                     feature=item.name,
                     collisions=sorted(collisions),
                 )
@@ -808,7 +808,7 @@ class Contract:
                 raise ContractDefinitionError(
                     f"Contract {self.name!r} has {bound}={value!r}, which must be a "
                     "non-negative integer.",
-                    code=MLC014,
+                    code=SPX014,
                     bound=bound,
                     value=value,
                 )
@@ -821,7 +821,7 @@ class Contract:
             raise ContractDefinitionError(
                 f"Contract {self.name!r} has min_rows={self.min_rows} greater than "
                 f"max_rows={self.max_rows}, so no dataset could ever satisfy it.",
-                code=MLC014,
+                code=SPX014,
                 min_rows=self.min_rows,
                 max_rows=self.max_rows,
             )
@@ -844,7 +844,7 @@ def _require_mapping(value: Any, *, where: str) -> None:
     if not isinstance(value, Mapping):
         raise ContractDefinitionError(
             f"Expected {where} to be a mapping of keys to values, got {type(value).__name__}.",
-            code=MLC010,
+            code=SPX010,
             where=where,
         )
 
@@ -865,7 +865,7 @@ def _reject_unknown_keys(data: Mapping[str, Any], permitted: Iterable[str], *, w
     hint = f" Did you mean {suggestions[0]!r}?" if suggestions else ""
     raise ContractDefinitionError(
         f"Unrecognised key {key!r} in {where}.{hint} Permitted keys: {', '.join(sorted(allowed))}.",
-        code=MLC002,
+        code=SPX002,
         key=key,
         where=where,
     )

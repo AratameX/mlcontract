@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 from tests._support import requires_pandas
 
 pd = pytest.importorskip("pandas", reason="requires the 'pandas' extra")
@@ -21,7 +21,7 @@ pytestmark = requires_pandas
 
 
 def source(frame: Any) -> Any:
-    from mlcontract.adapters.pandas import PandasSource
+    from schemapact.adapters.pandas import PandasSource
 
     return PandasSource(frame)
 
@@ -197,38 +197,38 @@ class TestEndToEnd:
             Feature("age", DType.INTEGER, nullable=False, min=18),
             Feature("country", DType.CATEGORICAL, allowed_values=["IN", "US"]),
         ).validate(pd.DataFrame({"age": [12, 41], "country": ["FR", "US"]}))
-        assert {v.code.code for v in report.violations} == {"MLC203", "MLC205"}
+        assert {v.code.code for v in report.violations} == {"SPX203", "SPX205"}
 
     def test_uniqueness(self):
         report = contract(Feature("id", DType.INTEGER, unique=True)).validate(
             pd.DataFrame({"id": [1, 2, 1]})
         )
-        assert [v.code.code for v in report.violations] == ["MLC207"]
+        assert [v.code.code for v in report.violations] == ["SPX207"]
 
     def test_pattern(self):
         report = contract(Feature("e", DType.STRING, pattern=r"^[^@]+@[^@]+$")).validate(
             pd.DataFrame({"e": ["a@b.com", "nope"]})
         )
-        assert [v.code.code for v in report.violations] == ["MLC206"]
+        assert [v.code.code for v in report.violations] == ["SPX206"]
 
     def test_row_bounds(self):
         report = contract(Feature("a", DType.INTEGER), min_rows=5).validate(
             pd.DataFrame({"a": [1]})
         )
-        assert [v.code.code for v in report.violations] == ["MLC105"]
+        assert [v.code.code for v in report.violations] == ["SPX105"]
 
     def test_extra_column_warns(self):
         report = contract(Feature("a", DType.INTEGER)).validate(pd.DataFrame({"a": [1], "b": [2]}))
         assert report.is_valid
-        assert [v.code.code for v in report.violations] == ["MLC102"]
+        assert [v.code.code for v in report.violations] == ["SPX102"]
 
     def test_report_names_the_source(self):
         report = contract(Feature("a", DType.INTEGER)).validate(pd.DataFrame({"a": [1]}))
         assert "DataFrame" in report.source
 
     def test_resolve_picks_the_pandas_adapter(self):
-        from mlcontract.adapters import resolve
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters import resolve
+        from schemapact.adapters.pandas import PandasSource
 
         chosen = resolve(pd.DataFrame({"a": [1]}), contract(Feature("a", DType.INTEGER)))
         assert isinstance(chosen, PandasSource)
@@ -248,7 +248,7 @@ class TestFastAndSlowPathsAgree:
     @staticmethod
     def slow(frame: Any) -> Any:
         """A source with the fast paths removed, forcing row iteration."""
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters.pandas import PandasSource
 
         class RowByRow(PandasSource):
             pass
@@ -334,27 +334,27 @@ class TestFastAndSlowPathsAgree:
 
     def test_a_pattern_on_a_non_text_column_declines(self):
         """Declining lets the slow path name the offending values precisely."""
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters.pandas import PandasSource
 
         frame = pd.DataFrame({"a": [1, 2, 3]})
         assert PandasSource(frame).failing_pattern("a", r"[a-z]+", limit=5) is None
 
     def test_a_pattern_on_mixed_objects_declines(self):
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters.pandas import PandasSource
 
         frame = pd.DataFrame({"a": pd.Series(["abc", 7, None], dtype=object)})
         result = PandasSource(frame).failing_pattern("a", r"[a-z]+", limit=5)
         assert result is None or result.count >= 1
 
     def test_a_bound_on_a_non_numeric_column_declines(self):
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters.pandas import PandasSource
 
         frame = pd.DataFrame({"a": ["x", "y"]})
         assert PandasSource(frame).failing_below("a", 0, limit=5) is None
 
     def test_uniqueness_on_unhashable_values_declines_or_reports(self):
         """An object column may hold lists, which pandas cannot hash."""
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters.pandas import PandasSource
 
         frame = pd.DataFrame({"a": pd.Series([[1], [1]], dtype=object)})
         source = PandasSource(frame)

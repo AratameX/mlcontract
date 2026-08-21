@@ -1,7 +1,7 @@
 """The validation engine.
 
 Nothing in this module knows what kind of data it is looking at. It sees only a
-:class:`~mlcontract._protocols.DataSource`, which is what lets one engine serve
+:class:`~schemapact._protocols.DataSource`, which is what lets one engine serve
 ``list[dict]``, CSV, pandas and everything added later.
 
 Checks run in two passes, in this order:
@@ -25,25 +25,25 @@ from collections import Counter
 from collections.abc import Callable, Sequence
 from typing import Any
 
-from mlcontract._protocols import DataSource, Failures, column_values
-from mlcontract.contract import Contract, Feature
-from mlcontract.exceptions import (
-    MLC101,
-    MLC102,
-    MLC103,
-    MLC104,
-    MLC105,
-    MLC106,
-    MLC201,
-    MLC202,
-    MLC203,
-    MLC204,
-    MLC205,
-    MLC206,
-    MLC207,
+from schemapact._protocols import DataSource, Failures, column_values
+from schemapact.contract import Contract, Feature
+from schemapact.exceptions import (
+    SPX101,
+    SPX102,
+    SPX103,
+    SPX104,
+    SPX105,
+    SPX106,
+    SPX201,
+    SPX202,
+    SPX203,
+    SPX204,
+    SPX205,
+    SPX206,
+    SPX207,
     ErrorCode,
 )
-from mlcontract.report import Sample, Severity, ValidationReport, Violation
+from schemapact.report import Sample, Severity, ValidationReport, Violation
 
 DEFAULT_MAX_SAMPLES = 5
 """How many offending values a violation carries unless told otherwise."""
@@ -182,7 +182,7 @@ def _check_row_count(contract: Contract, source: DataSource) -> list[Violation]:
     if contract.min_rows is not None and rows < contract.min_rows:
         found.append(
             Violation(
-                code=MLC105,
+                code=SPX105,
                 severity=Severity.ERROR,
                 message=f"Dataset has {rows} rows, fewer than the required minimum of "
                 f"{contract.min_rows}.",
@@ -197,7 +197,7 @@ def _check_row_count(contract: Contract, source: DataSource) -> list[Violation]:
     if contract.max_rows is not None and rows > contract.max_rows:
         found.append(
             Violation(
-                code=MLC106,
+                code=SPX106,
                 severity=Severity.ERROR,
                 message=f"Dataset has {rows} rows, more than the permitted maximum of "
                 f"{contract.max_rows}.",
@@ -229,7 +229,7 @@ def _check_columns(
             )
             found.append(
                 Violation(
-                    code=MLC101,
+                    code=SPX101,
                     severity=Severity.ERROR,
                     message=f"Required feature {feature.name!r} is missing from the data.",
                     feature=feature.name,
@@ -250,7 +250,7 @@ def _check_columns(
         severity = Severity.ERROR if not contract.allow_extra_columns else Severity.WARNING
         found.append(
             Violation(
-                code=MLC102,
+                code=SPX102,
                 severity=severity,
                 message=f"Data contains {len(extras)} column(s) the contract does not "
                 f"declare: {', '.join(repr(name) for name in extras)}.",
@@ -270,7 +270,7 @@ def _check_columns(
         if expected_order != actual_order:
             found.append(
                 Violation(
-                    code=MLC103,
+                    code=SPX103,
                     severity=Severity.ERROR,
                     message="Declared columns are not in the order the contract requires.",
                     rule="enforce_column_order",
@@ -299,7 +299,7 @@ def _check_feature(feature: Feature, source: DataSource, settings: _Settings) ->
         actual = str(observed) if observed is not None else "mixed"
         found.append(
             Violation(
-                code=MLC104,
+                code=SPX104,
                 severity=Severity.ERROR,
                 message=f"Column {feature.name!r} holds {actual} values but the contract "
                 f"declares {feature.dtype}.",
@@ -341,7 +341,7 @@ def _check_nulls(feature: Feature, source: DataSource, settings: _Settings) -> l
     if not feature.nullable:
         return [
             Violation(
-                code=MLC201,
+                code=SPX201,
                 severity=Severity.ERROR,
                 message=f"Column {feature.name!r} is declared not nullable but has "
                 f"{nulls} null value(s).",
@@ -358,7 +358,7 @@ def _check_nulls(feature: Feature, source: DataSource, settings: _Settings) -> l
     if feature.max_null_fraction is not None and fraction > feature.max_null_fraction:
         return [
             Violation(
-                code=MLC202,
+                code=SPX202,
                 severity=Severity.ERROR,
                 message=f"Column {feature.name!r} is {fraction:.1%} null, above the permitted "
                 f"maximum of {feature.max_null_fraction:.1%}.",
@@ -393,7 +393,7 @@ def _check_range(feature: Feature, source: DataSource, settings: _Settings) -> l
         )
         if below.any:
             found.append(
-                _bound_violation(feature, MLC203, "min", minimum, below, settings, "below")
+                _bound_violation(feature, SPX203, "min", minimum, below, settings, "below")
             )
 
     if feature.max is not None:
@@ -407,7 +407,7 @@ def _check_range(feature: Feature, source: DataSource, settings: _Settings) -> l
         )
         if above.any:
             found.append(
-                _bound_violation(feature, MLC204, "max", maximum, above, settings, "above")
+                _bound_violation(feature, SPX204, "max", maximum, above, settings, "above")
             )
 
     return found
@@ -472,7 +472,7 @@ def _check_allowed_values(
     unexpected = sorted({str(value) for value in failures.distinct})
     return [
         Violation(
-            code=MLC205,
+            code=SPX205,
             severity=Severity.ERROR,
             message=f"Column {feature.name!r} has {failures.count} value(s) outside the "
             f"allowed set. Unexpected: {', '.join(unexpected[:10])}.",
@@ -514,7 +514,7 @@ def _check_pattern(feature: Feature, source: DataSource, settings: _Settings) ->
 
     return [
         Violation(
-            code=MLC206,
+            code=SPX206,
             severity=Severity.ERROR,
             message=f"Column {feature.name!r} has {failures.count} value(s) that do not match "
             f"the pattern {feature.pattern!r}.",
@@ -556,7 +556,7 @@ def _check_unique(feature: Feature, source: DataSource, settings: _Settings) -> 
 
     return [
         Violation(
-            code=MLC207,
+            code=SPX207,
             severity=Severity.ERROR,
             message=f"Column {feature.name!r} is declared unique but has "
             f"{len(failures.distinct)} duplicated value(s) across {failures.count} rows.",

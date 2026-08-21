@@ -22,9 +22,9 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from mlcontract import _values
-from mlcontract.contract import Contract, Feature
-from mlcontract.dtypes import DType
+from schemapact import _values
+from schemapact.contract import Contract, Feature
+from schemapact.dtypes import DType
 
 MAX_CATEGORY_COUNT = 20
 """Most distinct values a column may have and still be called categorical."""

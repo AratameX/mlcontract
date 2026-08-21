@@ -3,8 +3,8 @@
 ## Setup
 
 ```bash
-git clone https://github.com/AratameX/mlcontract
-cd mlcontract
+git clone https://github.com/AratameX/schemapact
+cd schemapact
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pre-commit install
@@ -32,7 +32,7 @@ which ruff or mypy is authoritative.
 - Tests on Linux, macOS and Windows
 - Every example in `examples/` runs and produces the output it claims
 - The generated error-code reference matches the registry
-- The public API snapshot matches `mlcontract.__all__`
+- The public API snapshot matches `schemapact.__all__`
 
 The core-only jobs matter most. They fail if an optional dependency leaks into
 the core, which is the promise most easily broken by accident.

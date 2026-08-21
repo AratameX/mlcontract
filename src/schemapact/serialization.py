@@ -5,12 +5,12 @@ and back, and nothing else.
 
 That ignorance is the design. JSON and YAML are two spellings of one
 representation, not two contract systems: both decode to a plain dictionary,
-which :class:`~mlcontract.contract.Contract` then interprets through a single
+which :class:`~schemapact.contract.Contract` then interprets through a single
 code path. A contract written in YAML and the same contract written in JSON
 therefore produce byte-identical objects, and a bug fixed in one format is
 fixed in both because there is only one place to fix it.
 
-YAML support is optional. It requires ``pip install "mlcontract[yaml]"``, and
+YAML support is optional. It requires ``pip install "schemapact[yaml]"``, and
 its absence produces actionable guidance rather than a bare ``ImportError``.
 """
 
@@ -21,7 +21,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from mlcontract.exceptions import MLC010, ContractDefinitionError, missing_dependency
+from schemapact.exceptions import SPX010, ContractDefinitionError, missing_dependency
 
 JSON_SUFFIXES = frozenset({".json"})
 """File extensions read as JSON."""
@@ -61,7 +61,7 @@ def decode_json(text: str) -> Any:
     except json.JSONDecodeError as exc:
         raise ContractDefinitionError(
             f"Could not parse JSON: {exc.msg} at line {exc.lineno}, column {exc.colno}.",
-            code=MLC010,
+            code=SPX010,
             line=exc.lineno,
             column=exc.colno,
         ) from exc
@@ -113,7 +113,7 @@ def decode_yaml(text: str) -> Any:
     except yaml.YAMLError as exc:
         raise ContractDefinitionError(
             f"Could not parse YAML: {exc}",
-            code=MLC010,
+            code=SPX010,
         ) from exc
 
 
@@ -147,7 +147,7 @@ def decode_text(text: str, *, path: Path | str | None = None) -> Any:
     raise ContractDefinitionError(
         f"Cannot determine the contract format of {path!s}: unrecognised extension "
         f"{suffix!r}. Supported extensions: {supported}.",
-        code=MLC010,
+        code=SPX010,
         path=str(path),
     )
 
@@ -176,7 +176,7 @@ def encode_for_path(data: Mapping[str, Any], path: Path | str) -> str:
     raise ContractDefinitionError(
         f"Cannot determine the contract format for {path!s}: unrecognised extension "
         f"{suffix!r}. Supported extensions: {supported}.",
-        code=MLC010,
+        code=SPX010,
         path=str(path),
     )
 

@@ -16,20 +16,20 @@ The contract itself is invalid and cannot be used.
 
 | Code | Meaning |
 | --- | --- |
-| `MLC001` | Contract or feature name is missing or invalid |
-| `MLC002` | Unrecognised key in a contract document |
-| `MLC003` | Contract format version is not supported by this release |
-| `MLC004` | Contract version is not a valid semantic version |
-| `MLC005` | Duplicate feature name |
-| `MLC006` | Unknown data type |
-| `MLC007` | Constraint value is invalid |
-| `MLC008` | Constraint does not apply to this data type |
-| `MLC009` | Constraints contradict one another |
-| `MLC010` | Contract document is malformed |
-| `MLC011` | Required key is missing from a contract document |
-| `MLC012` | Contract declares no features |
-| `MLC013` | Declared previous name collides with a current feature name |
-| `MLC014` | Row-count bounds are invalid |
+| `SPX001` | Contract or feature name is missing or invalid |
+| `SPX002` | Unrecognised key in a contract document |
+| `SPX003` | Contract format version is not supported by this release |
+| `SPX004` | Contract version is not a valid semantic version |
+| `SPX005` | Duplicate feature name |
+| `SPX006` | Unknown data type |
+| `SPX007` | Constraint value is invalid |
+| `SPX008` | Constraint does not apply to this data type |
+| `SPX009` | Constraints contradict one another |
+| `SPX010` | Contract document is malformed |
+| `SPX011` | Required key is missing from a contract document |
+| `SPX012` | Contract declares no features |
+| `SPX013` | Declared previous name collides with a current feature name |
+| `SPX014` | Row-count bounds are invalid |
 
 ## MLC1xx — Structure
 
@@ -37,12 +37,12 @@ The shape of the data does not match: columns, order, types, row counts.
 
 | Code | Meaning |
 | --- | --- |
-| `MLC101` | A required feature is missing from the data |
-| `MLC102` | The data contains a column the contract does not declare |
-| `MLC103` | Columns are not in the order the contract declares |
-| `MLC104` | A column's type does not match the contract |
-| `MLC105` | The dataset has fewer rows than the contract permits |
-| `MLC106` | The dataset has more rows than the contract permits |
+| `SPX101` | A required feature is missing from the data |
+| `SPX102` | The data contains a column the contract does not declare |
+| `SPX103` | Columns are not in the order the contract declares |
+| `SPX104` | A column's type does not match the contract |
+| `SPX105` | The dataset has fewer rows than the contract permits |
+| `SPX106` | The dataset has more rows than the contract permits |
 
 ## MLC2xx — Values
 
@@ -50,13 +50,13 @@ Individual values violate the constraints declared for their feature.
 
 | Code | Meaning |
 | --- | --- |
-| `MLC201` | Null values in a feature declared not nullable |
-| `MLC202` | Proportion of nulls exceeds the permitted maximum |
-| `MLC203` | Values below the permitted minimum |
-| `MLC204` | Values above the permitted maximum |
-| `MLC205` | Values outside the permitted set |
-| `MLC206` | Values not matching the required pattern |
-| `MLC207` | Duplicate values in a feature declared unique |
+| `SPX201` | Null values in a feature declared not nullable |
+| `SPX202` | Proportion of nulls exceeds the permitted maximum |
+| `SPX203` | Values below the permitted minimum |
+| `SPX204` | Values above the permitted maximum |
+| `SPX205` | Values outside the permitted set |
+| `SPX206` | Values not matching the required pattern |
+| `SPX207` | Duplicate values in a feature declared unique |
 
 ## MLC9xx — Integrations
 
@@ -64,5 +64,5 @@ An optional dependency is missing, or the data cannot be read.
 
 | Code | Meaning |
 | --- | --- |
-| `MLC901` | An optional dependency is required but not installed |
-| `MLC902` | The data is of a kind no adapter can read |
+| `SPX901` | An optional dependency is required but not installed |
+| `SPX902` | The data is of a kind no adapter can read |

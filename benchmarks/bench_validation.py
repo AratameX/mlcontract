@@ -15,7 +15,7 @@ from functools import partial
 from typing import Any
 
 from benchmarks._harness import Suite, announce, measure
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 
 SIZES: tuple[int, ...] = (1_000, 10_000, 100_000)
 

@@ -19,7 +19,7 @@ from typing import Any
 
 import pytest
 
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 from tests._support import requires_pandas
 
 pd = pytest.importorskip("pandas", reason="requires the 'pandas' extra")
@@ -58,7 +58,7 @@ class SlowOnly:
 
 def both_paths(contract: Contract, frame: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     """Validate through the vectorised and iterating paths, and return both reports."""
-    from mlcontract.adapters.pandas import PandasSource
+    from schemapact.adapters.pandas import PandasSource
 
     source = PandasSource(frame)
     fast = contract.validate(source).to_dict()
@@ -244,7 +244,7 @@ class TestCombined:
     def test_samples_are_capped_identically(self):
         contract = one(Feature("a", DType.INTEGER, min=0))
         frame = pd.DataFrame({"a": list(range(-50, 0))})
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters.pandas import PandasSource
 
         source = PandasSource(frame)
         fast = contract.validate(source, max_samples=3).to_dict()
@@ -256,7 +256,7 @@ class TestCombined:
     def test_suppressed_samples_agree(self):
         contract = one(Feature("a", DType.INTEGER, min=0))
         frame = pd.DataFrame({"a": [-1, -2, 3]})
-        from mlcontract.adapters.pandas import PandasSource
+        from schemapact.adapters.pandas import PandasSource
 
         source = PandasSource(frame)
         fast = contract.validate(source, sample_values=False).to_dict()

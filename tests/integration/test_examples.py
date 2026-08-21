@@ -54,7 +54,7 @@ class TestQuickstart:
     def test_finds_the_expected_violations(self):
         """Each dirty row breaks a different rule; all must be reported at once."""
         output = run_example("01_quickstart.py").stdout
-        for code in ("MLC203", "MLC205", "MLC207"):
+        for code in ("SPX203", "SPX205", "SPX207"):
             assert code in output
 
 

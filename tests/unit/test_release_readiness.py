@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-import mlcontract
+import schemapact
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -35,7 +35,7 @@ def pyproject() -> dict[str, Any]:
 
 class TestVersion:
     def test_is_pep440(self):
-        assert _VERSION.match(mlcontract.__version__), mlcontract.__version__
+        assert _VERSION.match(schemapact.__version__), schemapact.__version__
 
     def test_lives_in_exactly_one_place(self):
         """A second version literal would eventually disagree with the first."""
@@ -44,7 +44,7 @@ class TestVersion:
     def test_the_installed_metadata_agrees(self):
         import importlib.metadata as metadata
 
-        assert metadata.version("mlcontract") == mlcontract.__version__
+        assert metadata.version("schemapact") == schemapact.__version__
 
 
 class TestTagMatching:
@@ -81,7 +81,7 @@ class TestTagMatching:
 class TestPackagingMetadata:
     def test_the_console_script_target_is_importable(self):
         """A broken entry point only shows up after someone installs and runs it."""
-        target = pyproject()["project"]["scripts"]["mlcontract"]
+        target = pyproject()["project"]["scripts"]["schemapact"]
         module, _, attribute = target.partition(":")
         imported = __import__(module, fromlist=[attribute])
         assert callable(getattr(imported, attribute))
@@ -109,7 +109,7 @@ class TestPackagingMetadata:
 
     def test_the_urls_point_at_the_real_repository(self):
         urls = pyproject()["project"]["urls"]
-        assert all("AratameX/mlcontract" in url for url in urls.values())
+        assert all("AratameX/schemapact" in url for url in urls.values())
 
 
 class TestReleaseWorkflow:

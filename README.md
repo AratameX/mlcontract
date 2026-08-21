@@ -1,11 +1,10 @@
-# mlcontract
+# schemapact
 
-**Executable data contracts for ML pipelines catch breaking
-schema changes before they reach production.**
+**Versioned data contracts that catch breaking schema changes before they reach production.**
 
-[![CI](https://github.com/AratameX/mlcontract/actions/workflows/ci.yml/badge.svg)](https://github.com/AratameX/mlcontract/actions/workflows/ci.yml)
-[![Docs](https://github.com/AratameX/mlcontract/actions/workflows/docs.yml/badge.svg)](https://github.com/AratameX/mlcontract/actions/workflows/docs.yml)
-[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org/project/mlcontract/)
+[![CI](https://github.com/AratameX/schemapact/actions/workflows/ci.yml/badge.svg)](https://github.com/AratameX/schemapact/actions/workflows/ci.yml)
+[![Docs](https://github.com/AratameX/schemapact/actions/workflows/docs.yml/badge.svg)](https://github.com/AratameX/schemapact/actions/workflows/docs.yml)
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org/project/schemapact/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 > **Status: pre-alpha.** The API may change before `v0.1.0`, when this notice is
@@ -15,9 +14,9 @@ schema changes before they reach production.**
 
 ## The problem
 
-Every ML system depends on assumptions that live nowhere in particular. Which
-columns the model expects. What types they are. What ranges are plausible. Which
-categories exist. What the output looks like.
+Every data pipeline depends on assumptions that live nowhere in particular.
+Which columns exist. What types they are. What ranges are plausible. Which
+categories are possible.
 
 Those assumptions are real, load-bearing and invisible. When one changes — a
 column renamed upstream, a dtype quietly shifting from `int64` to `object` after
@@ -25,12 +24,15 @@ a join, a new category appearing in production — nothing fails loudly. The
 pipeline runs. The model returns numbers. The numbers are wrong, and you find
 out from a dashboard a week later.
 
+This is worst in machine learning, where a model will happily produce confident
+predictions from data that no longer means what it did during training.
+
 ## The approach
 
 Write the assumptions down in a form a machine can check.
 
 ```python
-from mlcontract import Contract, DType, Feature
+from schemapact import Contract, DType, Feature
 
 contract = Contract(
     name="customer_features",
@@ -51,12 +53,12 @@ if not report.is_valid:
 customer_features v1.0.0 against DataFrame (12043 rows x 3 columns)
 FAILED: 2 error(s), 0 warning(s)
 
-  ERROR   MLC203 age: Column 'age' has 3 value(s) below the declared min of 18;
+  ERROR   SPX203 age: Column 'age' has 3 value(s) below the declared min of 18;
           furthest is 12.
           e.g. row 41=12, row 88=15, row 203=17
           fix: Clip or filter the offending rows, or relax min if the data is
                legitimately wider than the contract assumed.
-  ERROR   MLC205 country: Column 'country' has 1 value(s) outside the allowed
+  ERROR   SPX205 country: Column 'country' has 1 value(s) outside the allowed
           set. Unexpected: FR.
 ```
 
@@ -65,8 +67,12 @@ FAILED: 2 error(s), 0 warning(s)
 Plenty of libraries validate a dataframe. The distinguishing question here is
 not "is this data valid?" but **"will this change break the people downstream?"**
 
+A pact, not a schema: an agreement between the system producing data and the
+systems consuming it, versioned like any other interface and checked in both
+directions.
+
 ```bash
-mlcontract check-compatibility contracts/v1.yaml contracts/v2.yaml --mode backward
+schemapact check-compatibility contracts/v1.yaml contracts/v2.yaml --mode backward
 ```
 
 Contracts are versioned and diffable. Comparing two versions tells you what
@@ -87,7 +93,7 @@ in a direction.
 ## Installation
 
 ```bash
-pip install mlcontract
+pip install schemapact
 ```
 
 No required dependencies. Contracts are defined, validated, serialized to JSON
@@ -95,9 +101,9 @@ and diffed using the standard library alone.
 
 | Extra | Command | Adds |
 | --- | --- | --- |
-| YAML | `pip install "mlcontract[yaml]"` | YAML contracts |
-| pandas | `pip install "mlcontract[pandas]"` | DataFrame validation |
-| Both | `pip install "mlcontract[all]"` | |
+| YAML | `pip install "schemapact[yaml]"` | YAML contracts |
+| pandas | `pip install "schemapact[pandas]"` | DataFrame validation |
+| Both | `pip install "schemapact[all]"` | |
 
 Python 3.10+. Tested on 3.10–3.13, on Linux, macOS and Windows.
 
@@ -106,8 +112,8 @@ Python 3.10+. Tested on 3.10–3.13, on Linux, macOS and Windows.
 Read a contract off data you already have:
 
 ```bash
-mlcontract init --from-csv customers.csv --output contract.yaml
-mlcontract validate contract.yaml customers.csv
+schemapact init --from-csv customers.csv --output contract.yaml
+schemapact validate contract.yaml customers.csv
 ```
 
 Inference is deliberately cautious. Types generalise from a sample; observed
@@ -126,7 +132,7 @@ report = contract.validate(data)
 report.is_valid
 report.errors  # violations that invalidate the data
 report.warnings  # notable, but not invalidating
-report.codes()  # ('MLC203', 'MLC205') — for alerting
+report.codes()  # ('SPX203', 'SPX205') — for alerting
 report.for_feature("age")
 report.summary()  # human-readable
 report.to_json()  # machine-readable
@@ -179,11 +185,11 @@ it is, which is the exact failure this library exists to prevent.
 ## Command line
 
 ```bash
-mlcontract validate CONTRACT DATA
-mlcontract diff OLD NEW
-mlcontract check-compatibility OLD NEW --mode backward|forward|full
-mlcontract init [--from-csv PATH]
-mlcontract version
+schemapact validate CONTRACT DATA
+schemapact diff OLD NEW
+schemapact check-compatibility OLD NEW --mode backward|forward|full
+schemapact init [--from-csv PATH]
+schemapact version
 ```
 
 | Exit code | Meaning |
@@ -204,15 +210,15 @@ fails.
 ## In CI
 
 ```yaml
-- run: pip install "mlcontract[yaml,pandas]"
+- run: pip install "schemapact[yaml,pandas]"
 
 - name: Validate data
-  run: mlcontract validate contracts/input.yaml data/sample.csv
+  run: schemapact validate contracts/input.yaml data/sample.csv
 
 - name: Contract compatibility
   run: |
     git show origin/main:contracts/input.yaml > /tmp/base.yaml
-    mlcontract check-compatibility /tmp/base.yaml contracts/input.yaml --mode backward
+    schemapact check-compatibility /tmp/base.yaml contracts/input.yaml --mode backward
 ```
 
 An incompatible schema change becomes a red build instead of an incident.
@@ -241,11 +247,11 @@ Same checks, same data, same machine, 100,000 rows:
 | Approach | Median | Peak memory |
 | --- | ---: | ---: |
 | Hand-written pandas assertions | 1.6 ms | 0.5 MB |
-| **mlcontract, pandas adapter** | **7.9 ms** | **0.5 MB** |
+| **schemapact, pandas adapter** | **7.9 ms** | **0.5 MB** |
 | pandera, lazy validation | 10.3 ms | 3.6 MB |
 
 Around 13 million rows/second. Hand-written assertions are faster and always
-will be — they do nothing but compute booleans, while mlcontract returns
+will be — they do nothing but compute booleans, while schemapact returns
 structured violations with error codes, affected-row counts, sampled values and
 remediation text.
 
@@ -258,7 +264,7 @@ and full results.
 
 ## Comparison with alternatives
 
-| | mlcontract | pandera | Great Expectations |
+| | schemapact | pandera | Great Expectations |
 | --- | --- | --- | --- |
 | Dataframe validation | Yes | Yes | Yes |
 | Contract versioning | **Yes** | No | No |
@@ -272,7 +278,7 @@ and full results.
 If you need a large library of statistical checks, use pandera or Great
 Expectations. If you need to know whether a schema change will break the systems
 downstream, that is what this is for. They compose: nothing stops you running
-pandera in the hot path and mlcontract in CI.
+pandera in the hot path and schemapact in CI.
 
 ## Documentation
 
@@ -319,15 +325,15 @@ Two versions evolve independently:
 - The **contract file format**, carried in each contract's `spec_version`. A
   release that cannot read an older format is a breaking change and will say so.
 
-`mlcontract.__all__` is the compatibility promise. Anything not listed there is
+`schemapact.__all__` is the compatibility promise. Anything not listed there is
 internal and may change without notice, and a test fails if a public symbol
 disappears without the snapshot being updated in the same commit.
 
 ## Contributing
 
 ```bash
-git clone https://github.com/AratameX/mlcontract
-cd mlcontract
+git clone https://github.com/AratameX/schemapact
+cd schemapact
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pre-commit install
@@ -339,7 +345,7 @@ run locally means a green build. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Support
 
-- **Bugs and feature requests:** [GitHub Issues](https://github.com/AratameX/mlcontract/issues)
+- **Bugs and feature requests:** [GitHub Issues](https://github.com/AratameX/schemapact/issues)
 - **Security:** see [SECURITY.md](SECURITY.md) — please do not open a public issue
 
 ## License

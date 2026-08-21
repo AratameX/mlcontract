@@ -19,7 +19,7 @@ from typing import Any
 
 import pytest
 
-from mlcontract.cli.main import ExitCode, main
+from schemapact.cli.main import ExitCode, main
 from tests._support import requires_yaml
 
 CSV = """id,age,country,score,signup
@@ -82,13 +82,13 @@ def run(*args: Any) -> int:
 class TestVersion:
     def test_version_command(self, capsys):
         assert run("version") == ExitCode.SUCCESS
-        assert "mlcontract" in capsys.readouterr().out
+        assert "schemapact" in capsys.readouterr().out
 
     def test_version_flag(self, capsys):
         with pytest.raises(SystemExit) as exc:
             run("--version")
         assert exc.value.code == 0
-        assert "mlcontract" in capsys.readouterr().out
+        assert "schemapact" in capsys.readouterr().out
 
     def test_no_command_prints_help_and_fails(self, capsys):
         assert run() == ExitCode.USAGE_ERROR
@@ -108,7 +108,7 @@ class TestValidate:
     def test_text_output_names_the_failing_features(self, workspace, capsys):
         run("validate", workspace / "contract.json", workspace / "bad.csv")
         output = capsys.readouterr().out
-        assert "MLC203" in output
+        assert "SPX203" in output
         assert "age" in output
 
     def test_json_output_is_parseable(self, workspace, capsys):
@@ -120,7 +120,7 @@ class TestValidate:
     def test_json_output_lists_codes(self, workspace, capsys):
         run("validate", workspace / "contract.json", workspace / "bad.csv", "--format", "json")
         codes = {v["code"] for v in json.loads(capsys.readouterr().out)["violations"]}
-        assert {"MLC203", "MLC204", "MLC205"} <= codes
+        assert {"SPX203", "SPX204", "SPX205"} <= codes
 
     def test_no_samples_omits_offending_values(self, workspace, capsys):
         """Offending values are raw data and do not always belong in a build log."""
@@ -151,7 +151,7 @@ class TestValidate:
         )
         code = run("validate", workspace / "contract.json", workspace / "extra.csv")
         assert code == ExitCode.SUCCESS
-        assert "MLC102" in capsys.readouterr().out
+        assert "SPX102" in capsys.readouterr().out
 
     def test_fail_on_warning_promotes_warnings(self, workspace):
         (workspace / "extra.csv").write_text(
@@ -190,7 +190,7 @@ class TestValidateErrors:
         )
         code = run("validate", workspace / "broken.json", workspace / "people.csv")
         assert code == ExitCode.INVALID_CONTRACT
-        assert "MLC004" in capsys.readouterr().err
+        assert "SPX004" in capsys.readouterr().err
 
     def test_a_directory_is_a_usage_error(self, workspace):
         assert run("validate", workspace, workspace / "people.csv") == ExitCode.USAGE_ERROR
@@ -346,14 +346,14 @@ class TestInit:
         assert "Wrote" in capsys.readouterr().out
 
     def test_the_example_is_a_valid_contract(self, tmp_path):
-        from mlcontract import Contract
+        from schemapact import Contract
 
         target = tmp_path / "contract.json"
         run("init", "--output", target)
         assert Contract.load(target).name == "my_contract"
 
     def test_infers_from_csv(self, workspace):
-        from mlcontract import Contract, DType
+        from schemapact import Contract, DType
 
         target = workspace / "inferred.json"
         assert run("init", "--from-csv", workspace / "people.csv", "--output", target) == (
@@ -371,7 +371,7 @@ class TestInit:
         assert run("validate", target, workspace / "people.csv") == ExitCode.SUCCESS
 
     def test_nullability_is_inferred_from_blanks(self, workspace):
-        from mlcontract import Contract
+        from schemapact import Contract
 
         target = workspace / "inferred.json"
         run("init", "--from-csv", workspace / "people.csv", "--output", target)
@@ -381,14 +381,14 @@ class TestInit:
 
     def test_ranges_are_not_inferred_by_default(self, workspace):
         """A bound read off a sample rejects legitimate data that is slightly wider."""
-        from mlcontract import Contract
+        from schemapact import Contract
 
         target = workspace / "inferred.json"
         run("init", "--from-csv", workspace / "people.csv", "--output", target)
         assert Contract.load(target)["age"].min is None
 
     def test_ranges_can_be_requested(self, workspace):
-        from mlcontract import Contract
+        from schemapact import Contract
 
         target = workspace / "ranged.json"
         run(
@@ -402,7 +402,7 @@ class TestInit:
         assert Contract.load(target)["age"].min == 25
 
     def test_name_and_version_are_configurable(self, workspace):
-        from mlcontract import Contract
+        from schemapact import Contract
 
         target = workspace / "named.json"
         run(
@@ -434,7 +434,7 @@ class TestInit:
         assert run("init", "--from-csv", tmp_path / "nope.csv") == ExitCode.USAGE_ERROR
 
     def test_json_output_format(self, workspace):
-        from mlcontract import Contract
+        from schemapact import Contract
 
         target = workspace / "inferred.json"
         run("init", "--from-csv", workspace / "people.csv", "--output", target)
@@ -451,7 +451,7 @@ class TestConsoleScript:
 
     def invoke(self, *args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [sys.executable, "-m", "mlcontract.cli.main", *args],
+            [sys.executable, "-m", "schemapact.cli.main", *args],
             capture_output=True,
             text=True,
             cwd=cwd,
@@ -461,7 +461,7 @@ class TestConsoleScript:
     def test_module_entry_point_runs(self):
         result = self.invoke("version")
         assert result.returncode == 0
-        assert "mlcontract" in result.stdout
+        assert "schemapact" in result.stdout
 
     def test_help_lists_every_command(self):
         result = self.invoke("--help")
@@ -492,8 +492,8 @@ class TestConsoleScript:
 class TestErrorHandling:
     def test_a_missing_optional_extra_is_a_usage_error(self, workspace, monkeypatch, capsys):
         """Being told which extra to install beats a bare ImportError."""
-        from mlcontract import serialization
-        from mlcontract.exceptions import missing_dependency
+        from schemapact import serialization
+        from schemapact.exceptions import missing_dependency
 
         def absent(*_: object, **__: object) -> None:
             raise missing_dependency(package="PyYAML", extra="yaml", purpose="Reading YAML")
@@ -502,11 +502,11 @@ class TestErrorHandling:
         assert run("validate", workspace / "contract.json", workspace / "people.csv") == (
             ExitCode.USAGE_ERROR
         )
-        assert 'pip install "mlcontract[yaml]"' in capsys.readouterr().err
+        assert 'pip install "schemapact[yaml]"' in capsys.readouterr().err
 
     def test_an_os_error_is_reported_not_traced(self, workspace, monkeypatch, capsys):
         """A permission problem should print one line, not a traceback."""
-        import mlcontract.cli.main as cli_main
+        import schemapact.cli.main as cli_main
 
         def denied(_: object) -> None:
             raise PermissionError(13, "Permission denied", str(workspace / "contract.json"))
@@ -526,8 +526,8 @@ class TestErrorHandling:
 
 class TestInferenceEdgeCases:
     def test_a_small_domain_becomes_categorical(self, tmp_path):
-        from mlcontract import Contract, DType
-        from mlcontract._inference import infer_from_csv
+        from schemapact import Contract, DType
+        from schemapact._inference import infer_from_csv
 
         path = tmp_path / "d.csv"
         path.write_text("status\n" + "ok\nfail\nok\nok\nfail\nok\n", encoding="utf-8")
@@ -537,8 +537,8 @@ class TestInferenceEdgeCases:
 
     def test_mostly_unique_text_stays_a_plain_string(self, tmp_path):
         """Otherwise a column of identifiers becomes a closed domain of itself."""
-        from mlcontract import DType
-        from mlcontract._inference import infer_from_csv
+        from schemapact import DType
+        from schemapact._inference import infer_from_csv
 
         path = tmp_path / "d.csv"
         path.write_text("ref\n" + "".join(f"ref-{i}\n" for i in range(30)), encoding="utf-8")
@@ -546,8 +546,8 @@ class TestInferenceEdgeCases:
 
     def test_an_all_blank_column_defaults_to_string(self, tmp_path):
         """Nothing to go on, so choose the type least likely to reject real data."""
-        from mlcontract import DType
-        from mlcontract._inference import infer_from_csv
+        from schemapact import DType
+        from schemapact._inference import infer_from_csv
 
         path = tmp_path / "d.csv"
         path.write_text("a,b\n1,\n2,\n", encoding="utf-8")
@@ -556,24 +556,24 @@ class TestInferenceEdgeCases:
         assert contract["b"].nullable is True
 
     def test_booleans_are_recognised(self, tmp_path):
-        from mlcontract import DType
-        from mlcontract._inference import infer_from_csv
+        from schemapact import DType
+        from schemapact._inference import infer_from_csv
 
         path = tmp_path / "d.csv"
         path.write_text("flag\ntrue\nfalse\ntrue\n", encoding="utf-8")
         assert infer_from_csv(path)["flag"].dtype is DType.BOOLEAN
 
     def test_datetimes_are_recognised(self, tmp_path):
-        from mlcontract import DType
-        from mlcontract._inference import infer_from_csv
+        from schemapact import DType
+        from schemapact._inference import infer_from_csv
 
         path = tmp_path / "d.csv"
         path.write_text("t\n2026-01-01T10:00:00\n2026-01-02T11:30:00\n", encoding="utf-8")
         assert infer_from_csv(path)["t"].dtype is DType.DATETIME
 
     def test_categories_can_be_disabled(self, tmp_path):
-        from mlcontract import DType
-        from mlcontract._inference import infer_from_csv
+        from schemapact import DType
+        from schemapact._inference import infer_from_csv
 
         path = tmp_path / "d.csv"
         path.write_text("status\nok\nfail\nok\nok\n", encoding="utf-8")
@@ -585,21 +585,21 @@ class TestPackageLayout:
         """A function named ``main`` must not shadow the ``main`` submodule."""
         import types
 
-        import mlcontract.cli.main as module
+        import schemapact.cli.main as module
 
         assert isinstance(module, types.ModuleType)
 
     def test_the_entry_point_target_is_importable(self):
         """Pyproject points the console script at this exact path."""
-        from mlcontract.cli.main import run
+        from schemapact.cli.main import run
 
         assert callable(run)
 
     def test_run_exits_with_the_returned_code(self, monkeypatch):
         """``run`` must turn the return value into a process exit status."""
-        from mlcontract.cli.main import run
+        from schemapact.cli.main import run
 
-        monkeypatch.setattr(sys, "argv", ["mlcontract", "version"])
+        monkeypatch.setattr(sys, "argv", ["schemapact", "version"])
         with pytest.raises(SystemExit) as exc:
             run()
         assert exc.value.code == ExitCode.SUCCESS
@@ -615,7 +615,7 @@ class TestYamlFormat:
         assert (tmp_path / "contract.yaml").exists()
 
     def test_a_yaml_contract_validates_the_same_data(self, workspace):
-        from mlcontract import Contract
+        from schemapact import Contract
 
         Contract.load(workspace / "contract.json").save(workspace / "contract.yaml")
         assert run("validate", workspace / "contract.yaml", workspace / "people.csv") == (
@@ -623,7 +623,7 @@ class TestYamlFormat:
         )
 
     def test_yaml_and_json_contracts_agree(self, workspace):
-        from mlcontract import Contract
+        from schemapact import Contract
 
         Contract.load(workspace / "contract.json").save(workspace / "contract.yaml")
         assert run("validate", workspace / "contract.yaml", workspace / "bad.csv") == run(
@@ -635,7 +635,7 @@ class TestWindowsEncodings:
     """CSVs and contracts written by Windows tools carry a byte-order mark."""
 
     def test_init_ignores_a_bom_in_the_header(self, tmp_path):
-        from mlcontract._inference import infer_from_csv
+        from schemapact._inference import infer_from_csv
 
         path = tmp_path / "people.csv"
         path.write_text("id,age,country\n1,30,IN\n", encoding="utf-8-sig")
@@ -652,7 +652,7 @@ class TestWindowsEncodings:
 
     def test_a_contract_file_with_a_bom_loads(self, tmp_path):
         """json.loads rejects a byte-order mark outright."""
-        from mlcontract import Contract
+        from schemapact import Contract
 
         path = tmp_path / "c.json"
         path.write_text(json.dumps(CONTRACT), encoding="utf-8-sig")

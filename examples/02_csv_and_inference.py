@@ -14,8 +14,8 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from mlcontract import Contract
-from mlcontract._inference import infer_from_csv
+from schemapact import Contract
+from schemapact._inference import infer_from_csv
 
 SAMPLE = """customer_id,age,country,lifetime_value
 1,34,IN,240.50
