@@ -117,8 +117,15 @@ class TestReleaseWorkflow:
 
     @staticmethod
     def workflow() -> dict[str, Any]:
-        import yaml
+        """Parse the publish workflow, skipping where PyYAML is absent.
 
+        PyYAML is an optional extra, so the core-only CI jobs do not have it.
+        These are project-level checks rather than version- or
+        dependency-specific ones, so skipping them there loses nothing — and a
+        test that cannot run in a dependency-free environment defeats the point
+        of having one.
+        """
+        yaml = pytest.importorskip("yaml", reason="requires the 'yaml' extra")
         loaded: dict[str, Any] = yaml.safe_load(
             (ROOT / ".github" / "workflows" / "publish.yml").read_text(encoding="utf-8")
         )
