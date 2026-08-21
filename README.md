@@ -218,8 +218,8 @@ An incompatible schema change becomes a red build instead of an incident.
 
 ## Design commitments
 
-- **Dependency-free core.** CI installs no extras in half its test matrix, and
-  fails if pandas or PyYAML becomes importable. The promise is verified, not
+- **Dependency-free core.** Four of CI's ten test jobs install no extras at all
+  and fail if pandas or PyYAML becomes importable. The promise is verified, not
   asserted.
 - **One contract, many encodings.** JSON and YAML are encodings of a single
   representation, so the same contract in either produces an identical object.

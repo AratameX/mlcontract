@@ -687,9 +687,19 @@ class Contract:
             accepted, along with the semantic-version bump the changes require.
 
         Example:
-            >>> changes = v1.diff(v2)
+            >>> old = Contract(
+            ...     name="c", version="1.0.0",
+            ...     features=[Feature("age", DType.INTEGER, min=0)],
+            ... )
+            >>> new = Contract(
+            ...     name="c", version="2.0.0",
+            ...     features=[Feature("age", DType.INTEGER, min=18)],
+            ... )
+            >>> changes = old.diff(new)
             >>> changes.is_breaking
             True
+            >>> str(changes.required_bump)
+            'major'
         """
         from mlcontract.diff import compare
 
