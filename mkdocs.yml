@@ -59,5 +59,6 @@ nav:
   - Development:
       - Architecture: development/architecture.md
       - Contributing: development/contributing.md
+      - Releasing: development/releasing.md
 
 strict: true

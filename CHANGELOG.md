@@ -134,6 +134,18 @@ contract format carries its own `spec_version`.
   links resolve, the security policy offers a private channel, and the declared
   licence matches the package metadata.
 
+- Release workflow using PyPI Trusted Publishing: no API token exists anywhere
+  in the repository or its secrets. Every tagged release builds, publishes to
+  TestPyPI, installs from TestPyPI and runs a smoke test, and only then waits
+  for manual approval before touching PyPI.
+- The workflow refuses to publish when the tag and the package version disagree,
+  because publishing the wrong artifact under the right name cannot be undone.
+- Release runbook in `docs/development/releasing.md`, including one-time
+  Trusted Publishing setup and what to do when a release goes wrong.
+- Release-readiness tests: version wiring, console-script target importability,
+  advertised Python versions matching the floor, and the publish workflow's own
+  ordering and permissions.
+
 ### Changed
 
 - A pandas float column that contains nulls and holds only whole numbers is

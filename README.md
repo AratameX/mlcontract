@@ -1,6 +1,7 @@
 # mlcontract
 
-**Executable contracts for ML systems — validate data, models and predictions before they break production.**
+**Executable data contracts for ML pipelines catch breaking
+schema changes before they reach production.**
 
 [![CI](https://github.com/AratameX/mlcontract/actions/workflows/ci.yml/badge.svg)](https://github.com/AratameX/mlcontract/actions/workflows/ci.yml)
 [![Docs](https://github.com/AratameX/mlcontract/actions/workflows/docs.yml/badge.svg)](https://github.com/AratameX/mlcontract/actions/workflows/docs.yml)

@@ -26,6 +26,8 @@ REQUIRED = [
     ".github/dependabot.yml",
     ".github/ISSUE_TEMPLATE/bug_report.yml",
     ".github/ISSUE_TEMPLATE/feature_request.yml",
+    ".github/workflows/publish.yml",
+    "docs/development/releasing.md",
 ]
 
 
