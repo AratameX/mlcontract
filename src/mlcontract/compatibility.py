@@ -164,9 +164,19 @@ def check(
         The outcome, including which changes broke it and in which direction.
 
     Example:
-        >>> result = check(v1, v2, Compatibility.BACKWARD)
-        >>> if not result.is_compatible:
-        ...     print(result.summary())
+        >>> from mlcontract import DType, Feature
+        >>> old = Contract(
+        ...     name="c", version="1.0.0",
+        ...     features=[Feature("age", DType.INTEGER)],
+        ... )
+        >>> new = Contract(
+        ...     name="c", version="2.0.0",
+        ...     features=[Feature("age", DType.INTEGER), Feature("email", DType.STRING)],
+        ... )
+        >>> check(old, new, Compatibility.BACKWARD).is_compatible
+        False
+        >>> check(old, new, Compatibility.FORWARD).is_compatible
+        True
     """
     backward: tuple[Change, ...] = ()
     forward: tuple[Change, ...] = ()

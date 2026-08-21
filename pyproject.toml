@@ -86,12 +86,18 @@ mlcontract = ["py.typed"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-testpaths = ["tests"]
+# src is included so --doctest-modules reaches the library's own docstrings;
+# collection there finds doctests only, since there are no test functions in it.
+testpaths = ["tests", "src"]
 addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
     "--import-mode=importlib",
+    # Docstring examples are executed. They appear in the API reference as
+    # though they run, so one that does not is a documented lie — and two had
+    # already rotted before this was turned on.
+    "--doctest-modules",
 ]
 markers = [
     "pandas: requires the optional pandas extra",
