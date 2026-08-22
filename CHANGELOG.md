@@ -11,6 +11,14 @@ contract format carries its own `spec_version`.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.0] - 2026-08-22
+
+First release. Data contracts: define the shape a dataset must have, validate
+real data against it, and compare contract versions to find out whether a change
+breaks the systems downstream.
+
 ### Added
 
 - Validation engine. `Contract.validate(data)` and the module-level
@@ -228,4 +236,5 @@ contract format carries its own `spec_version`.
   `SPEC_VERSION`, and the three exception types.
 - Contract format: `spec_version` 1, introduced here.
 
-[Unreleased]: https://github.com/AratameX/schemapact/commits/main
+[Unreleased]: https://github.com/AratameX/schemapact/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/AratameX/schemapact/releases/tag/v0.1.0
