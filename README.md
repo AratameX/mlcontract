@@ -5,7 +5,7 @@
 [![CI](https://github.com/AratameX/schemapact/actions/workflows/ci.yml/badge.svg)](https://github.com/AratameX/schemapact/actions/workflows/ci.yml)
 [![Docs](https://github.com/AratameX/schemapact/actions/workflows/docs.yml/badge.svg)](https://github.com/AratameX/schemapact/actions/workflows/docs.yml)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org/project/schemapact/)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/AratameX/schemapact/blob/main/LICENSE)
 
 ---
 
@@ -256,7 +256,7 @@ Contract operations are effectively free: a diff is 0.04 ms, a full
 compatibility check 0.09 ms.
 
 Every figure comes from `python benchmarks/run_all.py`; see
-[the performance docs](docs/reference/performance.md) for methodology, caveats
+[the performance docs](https://github.com/AratameX/schemapact/blob/main/docs/reference/performance.md) for methodology, caveats
 and full results.
 
 ## Comparison with alternatives
@@ -279,18 +279,18 @@ pandera in the hot path and schemapact in CI.
 
 ## Documentation
 
-- [Installation](docs/getting-started/installation.md)
-- [Quickstart](docs/getting-started/quickstart.md)
-- [Writing contracts](docs/guides/contracts.md)
-- [Validating data](docs/guides/validation.md)
-- [Breaking changes](docs/guides/compatibility.md)
-- [Command line](docs/guides/cli.md)
-- [Error codes](docs/reference/errors.md)
-- [Architecture](docs/development/architecture.md)
+- [Installation](https://github.com/AratameX/schemapact/blob/main/docs/getting-started/installation.md)
+- [Quickstart](https://github.com/AratameX/schemapact/blob/main/docs/getting-started/quickstart.md)
+- [Writing contracts](https://github.com/AratameX/schemapact/blob/main/docs/guides/contracts.md)
+- [Validating data](https://github.com/AratameX/schemapact/blob/main/docs/guides/validation.md)
+- [Breaking changes](https://github.com/AratameX/schemapact/blob/main/docs/guides/compatibility.md)
+- [Command line](https://github.com/AratameX/schemapact/blob/main/docs/guides/cli.md)
+- [Error codes](https://github.com/AratameX/schemapact/blob/main/docs/reference/errors.md)
+- [Architecture](https://github.com/AratameX/schemapact/blob/main/docs/development/architecture.md)
 
 ## Examples
 
-Every example in [`examples/`](examples/) is executed by CI with assertions on
+Every example in [`examples/`](https://github.com/AratameX/schemapact/tree/main/examples) is executed by CI with assertions on
 its output, so none can quietly stop being true.
 
 | Example | Shows |
@@ -314,7 +314,7 @@ its output, so none can quietly stop being true.
 
 This project follows [Semantic Versioning](https://semver.org). Before `1.0.0`,
 minor versions may contain breaking API changes; each is described in
-[CHANGELOG.md](CHANGELOG.md).
+[CHANGELOG.md](https://github.com/AratameX/schemapact/blob/main/CHANGELOG.md).
 
 Two versions evolve independently:
 
@@ -338,13 +338,13 @@ python scripts/check.py
 ```
 
 `scripts/check.py` runs the same lint, type and test sequence CI does, so a green
-run locally means a green build. See [CONTRIBUTING.md](CONTRIBUTING.md).
+run locally means a green build. See [CONTRIBUTING.md](https://github.com/AratameX/schemapact/blob/main/CONTRIBUTING.md).
 
 ## Support
 
 - **Bugs and feature requests:** [GitHub Issues](https://github.com/AratameX/schemapact/issues)
-- **Security:** see [SECURITY.md](SECURITY.md) — please do not open a public issue
+- **Security:** see [SECURITY.md](https://github.com/AratameX/schemapact/blob/main/SECURITY.md) — please do not open a public issue
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Apache-2.0. See [LICENSE](https://github.com/AratameX/schemapact/blob/main/LICENSE) and [NOTICE](https://github.com/AratameX/schemapact/blob/main/NOTICE).

@@ -46,14 +46,42 @@ def test_no_placeholders_survive():
         assert "TODO(setup)" not in text, f"{name} still contains a setup TODO"
 
 
-def test_the_readme_links_to_docs_that_exist():
-    """A link to a page that was renamed is worse than no link."""
+REPO_URL = "https://github.com/AratameX/schemapact"
+
+
+def test_readme_links_are_absolute():
+    """Relative links break on PyPI.
+
+    GitHub resolves `[LICENSE](LICENSE)` against the repository. PyPI resolves
+    it against `pypi.org/project/schemapact/`, where no such file exists, so
+    every relative link on the project page is a 404.
+
+    Version 0.1.0 shipped with fifteen of them. The earlier version of this test
+    only checked that link targets existed *on disk*, which is exactly why it
+    passed.
+    """
     import re
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    targets = re.findall(r"\]\((docs/[^)#]+|examples/[^)#]*|[A-Z_]+\.md)\)", readme)
-    missing = [t for t in targets if not (ROOT / t).exists()]
-    assert not missing, f"README links to missing paths: {missing}"
+    relative = [
+        target
+        for target in re.findall(r"\]\(([^)]+)\)", readme)
+        if not target.startswith(("http://", "https://", "#"))
+    ]
+    assert not relative, (
+        f"README contains relative links, which 404 on PyPI: {relative}. "
+        f"Use absolute {REPO_URL}/blob/main/... URLs instead."
+    )
+
+
+def test_readme_repository_links_point_at_files_that_exist():
+    """Absolute links can still rot; check the paths they name are real."""
+    import re
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    paths = re.findall(rf"{re.escape(REPO_URL)}/(?:blob|tree)/main/([^)#]+)", readme)
+    missing = [path for path in paths if not (ROOT / path).exists()]
+    assert not missing, f"README links to paths that do not exist: {missing}"
 
 
 def test_contributing_names_the_real_gate():
