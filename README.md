@@ -7,9 +7,6 @@
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org/project/schemapact/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-> **Status: pre-alpha.** The API may change before `v0.1.0`, when this notice is
-> removed.
-
 ---
 
 ## The problem
