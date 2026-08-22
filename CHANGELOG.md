@@ -13,6 +13,20 @@ contract format carries its own `spec_version`.
 
 Nothing yet.
 
+## [0.1.1] - 2026-08-22
+
+### Fixed
+
+- Every link on the PyPI project page was a 404. The README used relative
+  links, which GitHub resolves against the repository and PyPI resolves against
+  `pypi.org/project/schemapact/`, where no such files exist. All fifteen are now
+  absolute URLs, which work identically in both places.
+
+### Compatibility
+
+- Python API: unchanged.
+- Contract format: unchanged, `spec_version` 1.
+
 ## [0.1.0] - 2026-08-22
 
 First release. Data contracts: define the shape a dataset must have, validate
@@ -236,5 +250,6 @@ breaks the systems downstream.
   `SPEC_VERSION`, and the three exception types.
 - Contract format: `spec_version` 1, introduced here.
 
-[Unreleased]: https://github.com/AratameX/schemapact/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/AratameX/schemapact/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/AratameX/schemapact/releases/tag/v0.1.1
 [0.1.0]: https://github.com/AratameX/schemapact/releases/tag/v0.1.0
