@@ -13,14 +13,14 @@ license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Pranav Bansode", email = "hawkeyes1818@gmail.com" }]
 maintainers = [{ name = "Pranav Bansode", email = "hawkeyes1818@gmail.com" }]
 keywords = [
-    "machine-learning",
     "data-contract",
-    "data-validation",
     "schema",
-    "mlops",
-    "contract-testing",
+    "schema-validation",
+    "data-validation",
     "breaking-changes",
+    "compatibility",
     "data-quality",
+    "contract-testing",
     "ci-cd",
 ]
 classifiers = [
